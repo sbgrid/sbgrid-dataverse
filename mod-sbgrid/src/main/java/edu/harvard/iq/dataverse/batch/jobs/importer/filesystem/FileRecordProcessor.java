@@ -110,8 +110,7 @@ public class FileRecordProcessor implements ItemProcessor {
             // set metadata and add to latest version
             FileMetadata fmd = new FileMetadata();
             fmd.setLabel(file.getName());
-            // todo: setDirectoryLabel once it's merged into develop
-            //fmd.setDirectoryLabel(relativePath.replace(File.separator + file.getName(), ""));
+            fmd.setDirectoryLabel(relativePath.replace(File.separator + file.getName(), ""));
             fmd.setDataFile(datafile);
             datafile.getFileMetadatas().add(fmd);
             if (version.getFileMetadatas() == null) version.setFileMetadatas(new ArrayList<>());
