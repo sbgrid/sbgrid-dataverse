@@ -72,6 +72,7 @@
             <version>4.5.1</version>
             <type>jar</type>
             <classifier>classes</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
