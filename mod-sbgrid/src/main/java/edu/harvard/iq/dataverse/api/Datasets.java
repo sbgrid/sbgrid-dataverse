@@ -772,21 +772,21 @@ public class Datasets extends AbstractApiBean {
                 JsonObjectBuilder bld = jsonObjectBuilder();
                 return this.ok(bld
                         .add("jobId", jid)
-                        .add("jobStatusUrl", "https://dv.sbgrid.org/api/batch/job/" + jid)
+                        .add("jobStatusUrl", systemConfig.getDataverseSiteUrl() + "/api/batch/job/" + jid)
                         .add("datasetId", datasetid)
                         .add("datasetIdentifier", datasetIdentifier)
                         .add("userId", userid)
                         .add("message", "FileSystemImportJob was started.")
                 );
-                
-            // FAILED
+
+                // FAILED
             } else if (failed.equals(status)) {
                 LOGGER.log(Level.SEVERE, "User notified about checksum validation failure.");
                 userNotificationSvc.sendNotification(depositingUser, new Timestamp(new Date().getTime()),
                         UserNotification.Type.CHECKSUMFAIL, dataset.getId());
                 return ok("User notified about checksum validation failure.");
-                
-            // OTHER
+
+                // OTHER
             } else {
                 LOGGER.log(Level.SEVERE, "Unexpected status cannot be processed: " + status);
                 return error(Response.Status.BAD_REQUEST, "Unexpected status cannot be processed: " + status);
