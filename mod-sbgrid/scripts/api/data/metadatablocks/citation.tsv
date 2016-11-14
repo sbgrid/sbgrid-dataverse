@@ -315,8 +315,9 @@
 	language	Yiddish		180											
 	language	Yoruba		181											
 	language	Zhuang, Chuang		182											
-	language	Zulu		183											
+	language	Zulu		183
+    language	Not applicable		184
 	dataType	X-Ray Diffraction	xray	0
 	dataType	Structural Model	sm	1
 	dataType	Micro-Electron Diffraction	me	2
- 	dataType	Lattice Light-Sheet Microscopy	llsm	3
+	dataType	Lattice Light-Sheet Microscopy	llsm	3
