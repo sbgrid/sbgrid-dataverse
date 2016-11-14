@@ -16,7 +16,6 @@ import edu.harvard.iq.dataverse.batch.entities.JobExecutionEntity;
 import edu.harvard.iq.dataverse.batch.util.LoggingUtil;
 import org.apache.commons.lang.StringUtils;
 
-import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.JobListener;
 import javax.batch.api.listener.StepListener;
 import javax.batch.operations.JobOperator;
@@ -29,6 +28,7 @@ import javax.ejb.EJB;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -52,11 +52,7 @@ public class FileRecordJobListener implements StepListener, JobListener {
     private StepContext stepContext;
 
     Properties jobParams;
-
-    @Inject
-    @BatchProperty
-    private String logDir;
-
+    
     @EJB
     UserNotificationServiceBean notificationServiceBean;
 
@@ -157,6 +153,9 @@ public class FileRecordJobListener implements StepListener, JobListener {
                 jobExecutionEntity.setEndTime(date);
                 jobJson = new ObjectMapper().writeValueAsString(jobExecutionEntity);
 
+                String logDir = System.getProperty("com.sun.aas.instanceRoot") + File.separator + "logs" 
+                        + File.separator + "batch-jobs" + File.separator;
+                        
                 // [1] save json log to file
                 LoggingUtil.saveJsonLog(jobJson, logDir, jobId);
                 // [2] send user notifications

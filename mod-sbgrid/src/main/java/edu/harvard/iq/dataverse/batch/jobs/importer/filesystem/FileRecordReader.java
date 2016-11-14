@@ -45,11 +45,7 @@ public class FileRecordReader extends AbstractItemReader {
     
     @Inject
     StepContext stepContext;
-
-    @Inject
-    @BatchProperty
-    String dataDir;
-
+    
     @Inject
     @BatchProperty
     String excludes;
@@ -95,7 +91,8 @@ public class FileRecordReader extends AbstractItemReader {
 
     @Override
     public void open(Serializable checkpoint) throws Exception {
-        directory = new File(dataDir + dataset.getAuthority() + File.separator + dataset.getIdentifier());
+        directory = new File(System.getProperty("dataverse.files.directory")
+                + File.separator + dataset.getAuthority() + File.separator + dataset.getIdentifier());
         if (isValidDirectory()) {
             files = getFiles(directory);
             iterator = files.listIterator();
