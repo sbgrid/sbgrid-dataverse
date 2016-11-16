@@ -9,6 +9,7 @@ import edu.harvard.iq.dataverse.UserServiceBean;
 import edu.harvard.iq.dataverse.authorization.AuthenticationServiceBean;
 import edu.harvard.iq.dataverse.authorization.Permission;
 import edu.harvard.iq.dataverse.authorization.users.AuthenticatedUser;
+import edu.harvard.iq.dataverse.batch.jobs.importer.ImportMode;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -42,10 +43,10 @@ public class FileRecordReader extends AbstractItemReader {
 
     @Inject
     JobContext jobContext;
-    
+
     @Inject
     StepContext stepContext;
-    
+
     @Inject
     @BatchProperty
     String excludes;
@@ -78,7 +79,7 @@ public class FileRecordReader extends AbstractItemReader {
 
     Dataset dataset;
     AuthenticatedUser user;
-    String mode = "MERGE";
+    String mode = ImportMode.MERGE.name();
 
     @PostConstruct
     public void init() {
@@ -130,7 +131,7 @@ public class FileRecordReader extends AbstractItemReader {
         }
         return null;
     }
-    
+
     /**
      * Get the list of files in the directory, minus any in the skip list.
      * @param directory
@@ -179,5 +180,5 @@ public class FileRecordReader extends AbstractItemReader {
         }
         return true;
     }
-    
+
 }

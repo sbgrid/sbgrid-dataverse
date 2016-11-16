@@ -13,6 +13,7 @@ import edu.harvard.iq.dataverse.actionlogging.ActionLogServiceBean;
 import edu.harvard.iq.dataverse.authorization.AuthenticationServiceBean;
 import edu.harvard.iq.dataverse.authorization.users.AuthenticatedUser;
 import edu.harvard.iq.dataverse.batch.entities.JobExecutionEntity;
+import edu.harvard.iq.dataverse.batch.jobs.importer.ImportMode;
 import edu.harvard.iq.dataverse.batch.util.LoggingUtil;
 import org.apache.commons.lang.StringUtils;
 
@@ -52,7 +53,7 @@ public class FileRecordJobListener implements StepListener, JobListener {
     private StepContext stepContext;
 
     Properties jobParams;
-    
+
     @EJB
     UserNotificationServiceBean notificationServiceBean;
 
@@ -67,7 +68,7 @@ public class FileRecordJobListener implements StepListener, JobListener {
 
     @EJB
     PermissionServiceBean permissionServiceBean;
-    
+
     @EJB
     DataFileServiceBean dataFileServiceBean;
     
@@ -84,22 +85,22 @@ public class FileRecordJobListener implements StepListener, JobListener {
     Dataset dataset;
     String mode;
     AuthenticatedUser user;
-    
+
     @Override
     public void beforeJob() throws Exception {
-        
+
         // update job properties to be used elsewhere to determine dataset, user and mode
         JobOperator jobOperator = BatchRuntime.getJobOperator();
         jobParams = jobOperator.getParameters(jobContext.getInstanceId());
         jobParams.setProperty("datasetGlobalId", getDatasetGlobalId());
         jobParams.setProperty("userId", getUserId());
         jobParams.setProperty("mode", getMode());
-        
+
         DatasetVersion workingVersion = dataset.getEditVersion();
-        
+
         // if mode = UPDATE or REPLACE, remove all filemetadata from the dataset version and start fresh
         // if mode = MERGE (default), do nothing since only new files will be added
-        if (mode.equalsIgnoreCase("UPDATE") || mode.equalsIgnoreCase("REPLACE")) {
+        if (mode.equalsIgnoreCase(ImportMode.UPDATE.name()) || mode.equalsIgnoreCase(ImportMode.REPLACE.name())) {
             try {
                 List <FileMetadata> fileMetadataList = workingVersion.getFileMetadatas();
                 for (FileMetadata fmd : fileMetadataList) {
@@ -125,7 +126,7 @@ public class FileRecordJobListener implements StepListener, JobListener {
     private void doReport() {
 
         try {
-            
+
             String jobJson;
             String jobId = Long.toString(jobContext.getInstanceId());
             JobOperator jobOperator = BatchRuntime.getJobOperator();
@@ -138,9 +139,9 @@ public class FileRecordJobListener implements StepListener, JobListener {
                 logger.log(Level.SEVERE, "Cannot find dataset.");
                 return;
             }
-            
+
             long datasetVersionId = dataset.getLatestVersion().getId();
-            
+
             JobExecution jobExecution = jobOperator.getJobExecution(jobContext.getInstanceId());
             if (jobExecution != null) {
 
@@ -153,13 +154,18 @@ public class FileRecordJobListener implements StepListener, JobListener {
                 jobExecutionEntity.setEndTime(date);
                 jobJson = new ObjectMapper().writeValueAsString(jobExecutionEntity);
 
-                String logDir = System.getProperty("com.sun.aas.instanceRoot") + File.separator + "logs" 
+                String logDir = System.getProperty("com.sun.aas.instanceRoot") + File.separator + "logs"
                         + File.separator + "batch-jobs" + File.separator;
-                        
+
                 // [1] save json log to file
                 LoggingUtil.saveJsonLog(jobJson, logDir, jobId);
                 // [2] send user notifications
                 notificationServiceBean.sendNotification(user, timestamp, notifyType, datasetVersionId);
+                // also send admin notification
+                AuthenticatedUser adminUser = authenticationServiceBean.getAdminUser();
+                if (adminUser != null) {
+                    notificationServiceBean.sendNotification(adminUser, timestamp, notifyType, datasetVersionId);
+                }
                 // [3] action log it
                 // truncate the log message or risk: 
                 // Internal Exception: org.postgresql.util.PSQLException: ERROR: value too long for type character varying(1024)
@@ -224,7 +230,7 @@ public class FileRecordJobListener implements StepListener, JobListener {
         if (jobParams.containsKey("mode")) {
             mode = jobParams.getProperty("mode").toUpperCase();
         } else {
-            mode = "MERGE";             
+            mode = ImportMode.MERGE.name();
         }
         return mode;
     }
