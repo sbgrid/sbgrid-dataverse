@@ -40,7 +40,7 @@ public class ChecksumReader extends AbstractItemReader {
 
     @Inject
     StepContext stepContext;
-    
+
     @Inject
     @BatchProperty
     String checksumManifest;
@@ -59,6 +59,8 @@ public class ChecksumReader extends AbstractItemReader {
     private String persistentUserData = "";
 
     File directory;
+    File manifest;
+    
 
     ArrayList<ChecksumRecord> records = new ArrayList<>();
 
@@ -86,14 +88,13 @@ public class ChecksumReader extends AbstractItemReader {
     @Override
     public void open(Serializable checkpoint) throws Exception {
 
-        directory = new File(System.getProperty("dataverse.files.directory") 
+        directory = new File(System.getProperty("dataverse.files.directory")
                 + File.separator + dataset.getAuthority() + File.separator + dataset.getIdentifier());
 
         if (preflight()) {
             StreamFactory factory = StreamFactory.newInstance();
             factory.loadResource("mapping.xml");
-            BeanReader in = factory.createReader("checksumRecord",
-                    new File(this.directory.getAbsolutePath() + FILE_SEPARATOR + checksumManifest));
+            BeanReader in = factory.createReader("checksumRecord", manifest);
             ChecksumRecord record;
             while ((record = (ChecksumRecord) in.read()) != null) {
                 record.setType(checksumType); // set algorithm, in anticipation of multi-algorithm support in dataverse
@@ -143,7 +144,7 @@ public class ChecksumReader extends AbstractItemReader {
     public boolean preflight() {
         String preflightMessage;
         // make sure the checksum manifest exists
-        File manifest = new File(this.directory.getAbsolutePath() + FILE_SEPARATOR + checksumManifest);
+        manifest = new File(this.directory.getAbsolutePath() + FILE_SEPARATOR + checksumManifest);
         if (!manifest.exists()) {
             this.preflight = false;
             preflightMessage = "The checksum manifest cannot be found: " + manifest.getAbsolutePath();
