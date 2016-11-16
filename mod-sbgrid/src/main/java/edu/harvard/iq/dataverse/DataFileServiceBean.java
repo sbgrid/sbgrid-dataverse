@@ -166,7 +166,7 @@ public class DataFileServiceBean implements java.io.Serializable {
                 return findCheapAndEasy((Long) query.getSingleResult());
             }
         } catch (Exception e) {
-            System.out.println("Error finding datafile by storageID and DataSetVersion: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error finding datafile by storageID and DataSetVersion: " + e.getMessage());
             return null;
         }
     }
@@ -217,7 +217,6 @@ public class DataFileServiceBean implements java.io.Serializable {
         Query query = em.createNativeQuery("select o.id from FileMetadata o where o.datasetVersion_id = "  + datasetVersionId
                 + searchClause
                 + " order by o." + sortField + " " + sortOrder);
-        //System.out.print(query.toString());
 
         return query.getResultList();
     }
