@@ -194,22 +194,26 @@ public class FileRecordJobIT {
     @After
     public void tearDownDataverse() {
         try {
+
+            // delete dataset
             if (isDraft) {
-                // delete dataset
                 given().header(API_TOKEN_HTTP_HEADER, token)
                         .delete("/api/datasets/" + dsId)
                         .then().assertThat().statusCode(200);
-                // delete dataverse
-                given().header(API_TOKEN_HTTP_HEADER, token)
-                        .delete("/api/dataverses/" + testName)
-                        .then().assertThat().statusCode(200);
-                // delete user
-                given().header(API_TOKEN_HTTP_HEADER, token)
-                        .delete("/api/admin/authenticatedUsers/" + testName + "/")
-                        .then().assertThat().statusCode(200);
             } else {
-                // todo: delete released dataset via api, is it possible?
-           }
+                given().post("/api/admin/superuser/" + testName);
+                given().header(API_TOKEN_HTTP_HEADER, token)
+                        .delete("/api/datasets/" + dsId + "/destroy")
+                        .then().assertThat().statusCode(200);
+            }
+            // delete dataverse
+            given().header(API_TOKEN_HTTP_HEADER, token)
+                    .delete("/api/dataverses/" + testName)
+                    .then().assertThat().statusCode(200);
+            // delete user
+            given().header(API_TOKEN_HTTP_HEADER, token)
+                    .delete("/api/admin/authenticatedUsers/" + testName + "/")
+                    .then().assertThat().statusCode(200);
             FileUtils.deleteDirectory(new File(dsDir));
         } catch (IOException ioe) {
             System.out.println("Error creating test dataset: " + ioe.getMessage());
@@ -289,7 +293,7 @@ public class FileRecordJobIT {
                     .body("status", equalTo("COMPLETED"));
             List<Integer> ids =  given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get("/api/batch/jobs/")
+                    .get(props.getProperty("job.status.api"))
                     .then().extract().jsonPath()
                     .getList("jobs.id");
             assertTrue(ids.contains((int)job.getId()));
@@ -301,6 +305,74 @@ public class FileRecordJobIT {
         }
     }
 
+    /**
+     * Import the same file in different directories, in the same dataset.
+     * This is not permitted via HTTP file upload since identical checksums are not allowed in the same dataset.
+     * Ignores failed checksum manifest import.
+     */
+    @Test
+    public void testSameFileInDifferentDirectoriesUnauthorizedUser() {
+
+        try {
+
+            // create unauthorized user
+            String unauthUser = UUID.randomUUID().toString().substring(0, 8);
+            String unauthToken = given()
+                    .body("{" +
+                            "   \"userName\": \"" + unauthUser + "\"," +
+                            "   \"firstName\": \"" + unauthUser + "\"," +
+                            "   \"lastName\": \"" + unauthUser + "\"," +
+                            "   \"email\": \"" + unauthUser + "@mailinator.com\"" +
+                            "}")
+                    .contentType(ContentType.JSON)
+                    .request()
+                    .post("/api/builtin-users/secret/" + props.getProperty("builtin.user.key"))
+                    .then().assertThat().statusCode(200)
+                    .extract().jsonPath().getString("data.apiToken");
+
+            // create a single test file and put it in two places
+            String file1 =  "testfile.txt";
+            String file2 = "subdir/testfile.txt";
+            File file = createTestFile(dsDir, file1, 0.25);
+            if (file != null) {
+                FileUtils.copyFile(file, new File(dsDir + file2));
+            } else {
+                System.out.println("Unable to copy file: " + dsDir + file2);
+                fail();
+            }
+
+            // mock the checksum manifest
+            String checksum1 = "asfdasdfasdfasdf";
+            String checksum2 = "sgsdgdsgfsdgsdgf";
+            if (file1 != null && file2 != null) {
+                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
+                pw.write(checksum1 + " " + file1);
+                pw.write("\n");
+                pw.write(checksum2 + " " + file2);
+                pw.write("\n");
+                pw.close();
+            } else {
+                fail();
+            }
+
+            // should return 403
+            given()
+                .header(API_TOKEN_HTTP_HEADER, unauthToken)
+                .post(props.getProperty("filesystem.api") + "/" + dsDoi)
+                .then().assertThat().statusCode(403);
+
+            // delete unauthorized user
+            given().header(API_TOKEN_HTTP_HEADER, token)
+                    .delete("/api/admin/authenticatedUsers/"+unauthUser+"/")
+                    .then().assertThat().statusCode(200);
+
+        } catch (Exception e) {
+            System.out.println("Error testSameFileInDifferentDirectoriesUnauthorizedUser: " + e.getMessage());
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
     @Test
     /**
      * Delete a file in REPLACE mode
@@ -370,7 +442,7 @@ public class FileRecordJobIT {
                     .body("status", equalTo("COMPLETED"));
             List<Integer> ids =  given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get("/api/batch/jobs/")
+                    .get(props.getProperty("job.status.api"))
                     .then().extract().jsonPath()
                     .getList("jobs.id");
             assertTrue(ids.contains((int)job.getId()));
@@ -424,7 +496,7 @@ public class FileRecordJobIT {
                     .body("status", equalTo("COMPLETED"));
             List<Integer> newIds =  given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get("/api/batch/jobs/")
+                    .get(props.getProperty("job.status.api"))
                     .then().extract().jsonPath()
                     .getList("jobs.id");
             assertTrue(newIds.contains((int)job.getId()));
@@ -505,7 +577,7 @@ public class FileRecordJobIT {
                     .body("status", equalTo("COMPLETED"));
             List<Integer> ids =  given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get("/api/batch/jobs/")
+                    .get(props.getProperty("job.status.api"))
                     .then().extract().jsonPath()
                     .getList("jobs.id");
             assertTrue(ids.contains((int)job.getId()));
@@ -568,7 +640,7 @@ public class FileRecordJobIT {
                     .body("status", equalTo("COMPLETED"));
             List<Integer> newIds =  given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get("/api/batch/jobs/")
+                    .get(props.getProperty("job.status.api"))
                     .then().extract().jsonPath()
                     .getList("jobs.id");
             assertTrue(newIds.contains((int)job.getId()));
@@ -908,7 +980,7 @@ public class FileRecordJobIT {
 
     @Test
     /**
-     * Published datasets should not allow import jobs for now (should skip all files and return failed status)
+     * Published datasets should not allow import jobs for now since it isn't in DRAFT mode
      */
     public void testPublishedDataset() {
 
@@ -930,62 +1002,9 @@ public class FileRecordJobIT {
             
             isDraft = false;
             
-            // create test files and checksum manifest
-            File file1 = createTestFile(dsDir, "testfile1.txt", 0.25);
-            File file2 = createTestFile(dsDir, "testfile2.txt", 0.25);
-            String checksum1 = "asfdasdfasdfasdf";
-            String checksum2 = "sgsdgdsgfsdgsdgf";
-            if (file1 != null && file2 != null) {
-                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
-                pw.write(checksum1 + " " + file1.getName());
-                pw.write("\n");
-                pw.write(checksum2 + " " + file2.getName());
-                pw.write("\n");
-                pw.close();
-            } else {
-                fail();
-            }
-
-            JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
-            StepExecutionEntity step1 = job.getSteps().get(0);
-            StepExecutionEntity step2 = job.getSteps().get(1);
-            Map<String, Long> metrics1 = step1.getMetrics();
-            Map<String, Long> metrics2 = step2.getMetrics();
-            // check job status
-            assertEquals(BatchStatus.COMPLETED.name(), job.getExitStatus());
-            assertEquals(BatchStatus.COMPLETED, job.getStatus());
-            // check step 1 status and name
-            assertEquals(BatchStatus.FAILED.name(), step1.getExitStatus());
-            assertEquals(BatchStatus.COMPLETED, step1.getStatus());
-            assertEquals("import-files", step1.getName());
-            // verify step 1 metrics
-            assertEquals(0, (long) metrics1.get("write_skip_count"));
-            assertEquals(1, (long) metrics1.get("commit_count"));
-            assertEquals(0, (long) metrics1.get("process_skip_count"));
-            assertEquals(0, (long) metrics1.get("read_skip_count"));
-            assertEquals(0, (long) metrics1.get("write_count")); // this is the key metric, no writes!
-            assertEquals(0, (long) metrics1.get("rollback_count"));
-            // these metrics can change depending on if oai-pmh is turned on and .cached files are created
-            assertTrue(metrics1.get("filter_count") > 0);
-            assertTrue(metrics1.get("read_count") > 0);
-            // should be failure message
-            assertTrue(step1.getPersistentUserData().startsWith("FAILED"));
-            // check step 2 status and name
-            assertEquals(BatchStatus.FAILED.name(), step2.getExitStatus());
-            assertEquals(BatchStatus.COMPLETED, step2.getStatus());
-            assertEquals(step2.getName(), "import-checksums");
-            // verify step 2 metrics
-            assertEquals(0, (long) metrics2.get("write_skip_count"));
-            assertEquals(1, (long) metrics2.get("commit_count"));
-            assertEquals(0, (long) metrics2.get("process_skip_count"));
-            assertEquals(0, (long) metrics2.get("read_skip_count"));
-            assertEquals(0, (long) metrics2.get("write_count"));
-            assertEquals(0, (long) metrics2.get("rollback_count"));
-            assertEquals(2, (long) metrics2.get("filter_count"));
-            assertEquals(2, (long) metrics2.get("read_count"));
-            // should be failure message
-            assertTrue(step2.getPersistentUserData().startsWith("FAILED"));
+            JsonPath jsonPath = getFaileJobJson();
+            assertTrue(jsonPath.getString("status").equalsIgnoreCase("ERROR"));
+            assertTrue(jsonPath.getString("message").contains("Dataset isn't in DRAFT mode."));
             
         } catch (Exception e) {
             System.out.println("Error testChecksumImport: " + e.getMessage());
@@ -993,6 +1012,52 @@ public class FileRecordJobIT {
             fail();
         }
     }
+    
+    
+//  todo: figure out how to create a new version using the native api - sorry, i can't get this to work...
+//    @Test
+//    /**
+//     * Datasets with more than one version not allowed
+//     */
+//    public void testMoreThanOneVersion() {
+//
+//        try {
+//
+//            RestAssured.urlEncodingEnabled = false;
+//            
+//            // publish the dataverse
+//            System.out.println("DATAVERSE: http://localhost:8080/api/dataverses/"+testName+"/actions/:publish?key="+token);
+//            given().body("{}").contentType("application/json")
+//                    .post("/api/dataverses/" + testName + "/actions/:publish?key="+token)
+//                    .then().assertThat().statusCode(200);
+//
+//            // publish the dataset
+//            System.out.println("DATASET: http://localhost:8080/api/datasets/"+dsId+"/actions/:publish?type=major&key="+token);
+//            given()
+//                    .get("/api/datasets/" + dsId + "/actions/:publish?type=major&key="+token)
+//                    .then().assertThat().statusCode(200);
+//
+//            // create a new draft version - can't get this to work, responds with 500 and stacktrace
+//            System.out.println("NEW DRAFT: http://localhost:8080/api/datasets/"+dsId+"/versions/:draft?key="+token);
+//            given()
+//                    .header(API_TOKEN_HTTP_HEADER, token)
+//                    .body(IOUtils.toString(classLoader.getResourceAsStream("json/dataset-finch1.json")))
+//                    .contentType("application/json")
+//                    .put("/api/datasets/" + dsId + "/versions/:draft?key="+token)
+//                    .then().assertThat().statusCode(201);
+//
+//
+//            JsonPath jsonPath = getFaileJobJson();
+//            jsonPath.prettyPrint();
+//            assertTrue(jsonPath.getString("status").equalsIgnoreCase("ERROR"));
+//            assertTrue(jsonPath.getString("message").contains("Dataset has more than one version."));
+//
+//        } catch (Exception e) {
+//            System.out.println("Error testMoreThanOneVersion: " + e.getMessage());
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 
     @Test
     /**
@@ -1004,7 +1069,7 @@ public class FileRecordJobIT {
             // run batch job
             String dsNotFound  = given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("filesystem.api") + "/" + fakeDoi)
+                    .post(props.getProperty("filesystem.api") + "/" + fakeDoi)
                     .then().assertThat().statusCode(400)
                     .extract().jsonPath().getString("message");
             assertEquals("Can't find dataset with ID: doi:" + fakeDoi, dsNotFound);
@@ -1015,48 +1080,7 @@ public class FileRecordJobIT {
             fail();
         }
     }
-
-    @Test
-    /**
-     * Unauthorize users shouldn't be able to run jobs
-     */
-    public void testUnauthorizedUser() {
-        try {
-            // create unauthorized user
-            String unauthUser = UUID.randomUUID().toString().substring(0, 8);
-            String unauthToken = given()
-                    .body("{" +
-                            "   \"userName\": \"" + unauthUser + "\"," +
-                            "   \"firstName\": \"" + unauthUser + "\"," +
-                            "   \"lastName\": \"" + unauthUser + "\"," +
-                            "   \"email\": \"" + unauthUser + "@mailinator.com\"" +
-                            "}")
-                    .contentType(ContentType.JSON)
-                    .request()
-                    .post("/api/builtin-users/secret/" + props.getProperty("builtin.user.key"))
-                    .then().assertThat().statusCode(200)
-                    .extract().jsonPath().getString("data.apiToken");
-
-            // attempt to run batch job as unauthorized user
-            String message  = given()
-                    .header(API_TOKEN_HTTP_HEADER, unauthToken)
-                    .get(props.getProperty("filesystem.api") + "/" + dsDoi)
-                    .then().assertThat().statusCode(403)
-                    .extract().jsonPath().getString("message");
-            assertEquals("User is not authorized.", message);
-
-            // delete unauthorized user
-            given().header(API_TOKEN_HTTP_HEADER, token)
-                    .delete("/api/admin/authenticatedUsers/"+unauthUser+"/")
-                    .then().assertThat().statusCode(200);
-
-        } catch (Exception e) {
-            System.out.println("Error testUnauthorizedUser: " + e.getMessage());
-            e.printStackTrace();
-            fail();
-        }
-    }
-
+    
     // UTILS
 
     /***
@@ -1170,9 +1194,9 @@ public class FileRecordJobIT {
                             .get(props.getProperty("job.status.api") + jobId);
                     json = jobResponse.body().asString();
                     status = JsonPath.from(json).getString("status");
-                    System.out.println("JOB STATUS RETRY ATTEMPT: " + Integer.toString(retry));
+                    System.out.println("JOB STATUS RETRY ATTEMPT: " + maxTries);
                 } else {
-                    System.out.println("JOB STATUS ERROR: Failed to get job status after " + Integer.toString(retry) 
+                    System.out.println("JOB STATUS ERROR: Failed to get job status after " + maxTries
                             + " attempts.");
                     break;
                 }
@@ -1185,6 +1209,20 @@ public class FileRecordJobIT {
     }
 
     /**
+     * A failed job is expected, get the json failure response
+     * @return
+     */
+    private JsonPath getFaileJobJson() {
+        System.out.println("JOB API: " + props.getProperty("filesystem.api") + "/" + dsDoi);
+        JsonPath jsonPath = given()
+                .header(API_TOKEN_HTTP_HEADER, token)
+                .post(props.getProperty("filesystem.api") + "/" + dsDoi)
+                .then().assertThat().statusCode(400)
+                .extract().jsonPath();
+        return jsonPath;
+    }
+    
+    /**
      * Kick off a job with default mode (MERGE)
      * @return a job execution entity
      */
@@ -1194,7 +1232,7 @@ public class FileRecordJobIT {
             // run batch job and wait for result
             String jobId = given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("filesystem.api") + "/" + dsDoi)
+                    .post(props.getProperty("filesystem.api") + "/" + dsDoi)
                     .then().assertThat().statusCode(200)
                     .extract().jsonPath().getString("data.executionId");
             String jobResult = pollJobStatus(jobId, token, Integer.valueOf(props.getProperty("polling.retries")),
@@ -1208,6 +1246,29 @@ public class FileRecordJobIT {
     }
 
     /**
+     * Kick off a job with default mode (MERGE)
+     * @return a job execution entity
+     */
+    private JobExecutionEntity getJobWithToken(String userToken) {
+        System.out.println("JOB API: " + props.getProperty("filesystem.api") + "/" + dsDoi);
+        System.out.println("TOKEN USED: " + userToken);
+        try {
+            // run batch job and wait for result
+            String jobId = given()
+                    .header(API_TOKEN_HTTP_HEADER, userToken)
+                    .post(props.getProperty("filesystem.api") + "/" + dsDoi)
+                    .then().assertThat().statusCode(200)
+                    .extract().jsonPath().getString("data.executionId");
+            String jobResult = pollJobStatus(jobId, token, Integer.valueOf(props.getProperty("polling.retries")),
+                    Integer.valueOf(props.getProperty("polling.wait")));
+            System.out.println("JOB JSON: " + jobResult);
+            return mapper.readValue(jobResult, JobExecutionEntity.class);
+        } catch (IOException ioe) {
+            System.out.println("Error getting job execution entity: " + ioe.getMessage());
+            return null;
+        }
+    }
+    /**
      * Kick off a job with a specified mode: MERGE, UPDATE, REPLACE
      * @param mode
      * @return a job entity
@@ -1218,7 +1279,7 @@ public class FileRecordJobIT {
             // run batch job and wait for result
             String jobId = given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("filesystem.api") + "/" + dsDoi + "?mode=" + mode.toUpperCase())
+                    .post(props.getProperty("filesystem.api") + "/" + dsDoi + "?mode=" + mode.toUpperCase())
                     .then().assertThat().statusCode(200)
                     .extract().jsonPath().getString("data.executionId");
             String jobResult = pollJobStatus(jobId, token, Integer.valueOf(props.getProperty("polling.retries")),
