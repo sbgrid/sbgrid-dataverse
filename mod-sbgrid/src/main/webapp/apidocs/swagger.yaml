@@ -319,7 +319,7 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /batch/jobs:
+  /admin/batch/jobs:
     get:
       summary: list batch jobs
       description: list batch jobs
@@ -400,12 +400,12 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /batch/jobs/{name}:
+  /admin/batch/jobs/name/{jobname}:
     get:
       summary: list jobs by job name
       description: list all jobs that have a particular job name
       parameters:
-        - name: name
+        - name: jobname
           in: path
           description: job name
           required: true
@@ -435,47 +435,7 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /batch/jobs/{name}/{id}:
-    get:
-      summary: get job status by name and id
-      description: get job status of job that has a particular job name and id
-      parameters:
-        - name: name
-          in: path
-          description: job name
-          required: true
-          type: string
-        - name: id
-          in: path
-          description: job id
-          required: true
-          type: integer
-      tags:
-        - "Batch Job Module"
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: "Batch job status"
-          schema:
-            $ref: "#/definitions/BatchJob"
-        "401":
-          description: "Unknown API key, insufficient permissions"
-          schema:
-            $ref: "#/definitions/Error"
-        "404":
-          description: "Unable to locate batch job with specified id"
-          schema:
-            $ref: "#/definitions/Error"
-        "501":
-          description: "Batch job not supported"
-          schema:
-            $ref: "#/definitions/Error"
-        default:
-          description: "Unexpected error"
-          schema:
-            $ref: "#/definitions/Error"
-  /batch/job/{id}:
+  /admin/batch/jobs/{id}:
     get:
       summary: get job status by id
       description: gets the status of a particular batch job
@@ -510,8 +470,8 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /import/datasets/files/{doi1}/{doi2}/{doi3}:
-    get:
+  /batch/jobs/import/datasets/files/{doi1}/{doi2}/{doi3}:
+    post:
       summary: import dataset from file system
       description: |
         <p>Imports a dataset's datafiles from the file system.</p>
