@@ -20,26 +20,24 @@ public class DataciteExporter implements Exporter {
     
     @Override
     public void exportDataset(DatasetVersion version, JsonObject json, OutputStream os) throws ExportException {
-        DataciteTemplateWriter writer = new DataciteTemplateWriter();
-        writer.setDataset(version.getDataset());
-        writer.setSchemaUrl(DATACITE_XML_SCHEMA_URL);
-        writer.process(os, true);
+        try {
+            DataciteTemplateWriter writer = new DataciteTemplateWriter();
+            writer.setDataset(version.getDataset());
+            writer.setSchemaUrl(DATACITE_XML_SCHEMA_URL);
+            writer.process(os, true);
+        } catch (Exception e) {
+            throw new ExportException("Error performing DataCite export: " + e.getMessage());
+        }
     }
 
     @Override
-    public Boolean isXMLFormat() {
-        return true;
-    }
+    public Boolean isXMLFormat() { return true; }
 
     @Override
-    public Boolean isHarvestable() {
-        return true;
-    }
+    public Boolean isHarvestable() { return true; }
 
     @Override
-    public Boolean isAvailableToUsers() {
-        return true;
-    }
+    public Boolean isAvailableToUsers() { return true; }
 
     @Override
     public String getXMLNameSpace() throws ExportException { return DATACITE_XML_NAMESPACE; }
@@ -51,14 +49,10 @@ public class DataciteExporter implements Exporter {
     public String getXMLSchemaVersion() throws ExportException { return DEFAULT_XML_VERSION; }
 
     @Override
-    public String getProviderName() {
-        return PROVIDER_NAME;
-    }
+    public String getProviderName() { return PROVIDER_NAME; }
 
     @Override
-    public String getDisplayName() {
-        return  DISPLAY_NAME;
-    }
+    public String getDisplayName() { return  DISPLAY_NAME; }
 
     @Override
     public void setParam(String name, Object value) { }

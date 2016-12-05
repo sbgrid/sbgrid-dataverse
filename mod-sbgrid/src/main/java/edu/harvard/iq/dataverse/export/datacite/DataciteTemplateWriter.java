@@ -85,7 +85,7 @@ public class DataciteTemplateWriter {
         this.schemaUrl = schemaUrl;
     }
 
-    public void process(OutputStream outputStream, boolean validate) {
+    public void process(OutputStream outputStream, boolean validate) throws Exception {
         if (validate) {
             StringWriter sw = new StringWriter();
             this.process(sw);
@@ -98,13 +98,9 @@ public class DataciteTemplateWriter {
         process(new OutputStreamWriter(outputStream));
     }
     
-    private void process(Writer writer) {
-        try {
-            Template template = cfg.getTemplate(this.template);
-            template.process(this.dataciteDataModel.getData(), writer);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unable to generate datacite xml: " + e.getMessage());
-        }
+    private void process(Writer writer) throws Exception {
+        Template template = cfg.getTemplate(this.template);
+        template.process(this.dataciteDataModel.getData(), writer);
     }    
     
 }
