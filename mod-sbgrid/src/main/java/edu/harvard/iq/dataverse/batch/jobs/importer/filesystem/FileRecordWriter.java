@@ -7,23 +7,23 @@ import edu.harvard.iq.dataverse.DatasetVersion;
 import edu.harvard.iq.dataverse.EjbDataverseEngine;
 import edu.harvard.iq.dataverse.FileMetadata;
 import edu.harvard.iq.dataverse.authorization.AuthenticationServiceBean;
-import edu.harvard.iq.dataverse.authorization.groups.impl.ipaddress.ip.IpAddress;
 import edu.harvard.iq.dataverse.authorization.users.AuthenticatedUser;
 import edu.harvard.iq.dataverse.engine.command.Command;
 import edu.harvard.iq.dataverse.engine.command.DataverseRequest;
 import edu.harvard.iq.dataverse.engine.command.exception.CommandException;
 import edu.harvard.iq.dataverse.engine.command.impl.UpdateDatasetVersionCommand;
 
+import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.ejb.EJB;
-import javax.ejb.EJBException;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -46,6 +46,14 @@ public class FileRecordWriter extends AbstractItemWriter {
 
     @Inject
     StepContext stepContext;
+
+    @Inject
+    @BatchProperty
+    String checksumManifest;
+
+    @Inject
+    @BatchProperty
+    String checksumType;
 
     @EJB
     DatasetServiceBean datasetServiceBean;
@@ -70,6 +78,8 @@ public class FileRecordWriter extends AbstractItemWriter {
 
     @Override
     public void close() {
+        // update the dataset
+        updateDatasetVersion(dataset.getLatestVersion());
         if (!persistentUserData.isEmpty()) {
             stepContext.setPersistentUserData(persistentUserData);
         }
@@ -77,15 +87,11 @@ public class FileRecordWriter extends AbstractItemWriter {
 
     @Override
     public void writeItems(List list) {
-
         List<DataFile> datafiles = dataset.getFiles();
         for (Object file : list) {
             datafiles.add(createDataFile((File) file));
         }
-        // update the dataset
         dataset.getLatestVersion().getDataset().setFiles(datafiles);
-        updateDatasetVersion(dataset.getLatestVersion());
-
     }
     
     // utils
@@ -102,16 +108,8 @@ public class FileRecordWriter extends AbstractItemWriter {
         if (dataset.getVersions().size() == 1 && version.getVersionState() == DatasetVersion.VersionState.DRAFT) {
             try {
                 Command<DatasetVersion> cmd;
-                cmd = new UpdateDatasetVersionCommand(new DataverseRequest(user, (IpAddress) null), version);
+                cmd = new UpdateDatasetVersionCommand(new DataverseRequest(user, (HttpServletRequest) null), version);
                 commandEngine.submit(cmd);
-            } catch (EJBException cause) {
-                StringBuilder trace = new StringBuilder();
-                for(StackTraceElement element:cause.getStackTrace()) {
-                    trace.append(cause).append(" ").append(element).append(cause.getMessage()).append("\n");
-                }
-                String ejbError = "EJBException updating DatasetVersion from batch job: " + trace.toString();
-                logger.log(Level.SEVERE, ejbError);
-                persistentUserData += ejbError + " ";
             } catch (CommandException ex) {
                 String commandError = "CommandException updating DatasetVersion from batch job: " + ex.getMessage();
                 logger.log(Level.SEVERE, commandError);
@@ -134,32 +132,49 @@ public class FileRecordWriter extends AbstractItemWriter {
      */
     private DataFile createDataFile(File file) {
         
-            DatasetVersion version = dataset.getLatestVersion();
-            String path = file.getAbsolutePath();
-            String gid = dataset.getAuthority() + dataset.getDoiSeparator() + dataset.getIdentifier();
-            String relativePath = path.substring(path.indexOf(gid) + gid.length() + 1);
-            DataFile datafile = new DataFile("application/octet-stream"); // we don't determine mime type
-            datafile.setStorageIdentifier(relativePath);
-            datafile.setFilesize(file.length());
-            datafile.setModificationTime(new Timestamp(new Date().getTime()));
-            datafile.setCreateDate(new Timestamp(new Date().getTime()));
-            datafile.setPermissionModificationTime(new Timestamp(new Date().getTime()));
-            datafile.setOwner(dataset);
-            datafile.setIngestDone();
-            datafile.setChecksumType(DataFile.ChecksumType.SHA1);
-            datafile.setChecksumValue("Unknown"); // only temporary since a checksum import job will run next
+        DatasetVersion version = dataset.getLatestVersion();
+        String path = file.getAbsolutePath();
+        String gid = dataset.getAuthority() + dataset.getDoiSeparator() + dataset.getIdentifier();
+        String relativePath = path.substring(path.indexOf(gid) + gid.length() + 1);
+        DataFile datafile = new DataFile("application/octet-stream"); // we don't determine mime type
+        datafile.setStorageIdentifier(relativePath);
+        datafile.setFilesize(file.length());
+        datafile.setModificationTime(new Timestamp(new Date().getTime()));
+        datafile.setCreateDate(new Timestamp(new Date().getTime()));
+        datafile.setPermissionModificationTime(new Timestamp(new Date().getTime()));
+        datafile.setOwner(dataset);
+        datafile.setIngestDone();
+        
+        // check system property first, otherwise use the batch job property
+        String jobChecksumType;
+        if (System.getProperty("checksumType") != null) {
+            jobChecksumType = System.getProperty("checksumType");
+        } else {
+            jobChecksumType = checksumType;
+        }
+        datafile.setChecksumType(DataFile.ChecksumType.SHA1); // initial default
+        for (DataFile.ChecksumType type : DataFile.ChecksumType.values()) {
+            if (jobChecksumType.equalsIgnoreCase(type.name())) {
+                datafile.setChecksumType(type);
+                break;
+            }
+        }
+        datafile.setChecksumValue("Unknown"); // only temporary since a checksum import job will run next
 
-            // set metadata and add to latest version
-            FileMetadata fmd = new FileMetadata();
-            fmd.setLabel(file.getName());
+        // set metadata and add to latest version
+        FileMetadata fmd = new FileMetadata();
+        fmd.setLabel(file.getName());
+        // set the subdirectory if there is one
+        if (relativePath.contains(File.separator)) {
             fmd.setDirectoryLabel(relativePath.replace(File.separator + file.getName(), ""));
-            fmd.setDataFile(datafile);
-            datafile.getFileMetadatas().add(fmd);
-            if (version.getFileMetadatas() == null) version.setFileMetadatas(new ArrayList<>());
-            version.getFileMetadatas().add(fmd);
-            fmd.setDatasetVersion(version);
+        }
+        fmd.setDataFile(datafile);
+        datafile.getFileMetadatas().add(fmd);
+        if (version.getFileMetadatas() == null) version.setFileMetadatas(new ArrayList<>());
+        version.getFileMetadatas().add(fmd);
+        fmd.setDatasetVersion(version);
 
-            return datafile;
+        return datafile;
     }
     
 }

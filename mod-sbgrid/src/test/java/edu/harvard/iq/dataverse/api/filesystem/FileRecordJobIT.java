@@ -24,6 +24,8 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
+import edu.harvard.iq.dataverse.api.UtilIT;
+import edu.harvard.iq.dataverse.authorization.DataverseRole;
 import edu.harvard.iq.dataverse.batch.entities.JobExecutionEntity;
 import edu.harvard.iq.dataverse.batch.entities.StepExecutionEntity;
 import org.apache.commons.io.FileUtils;
@@ -118,7 +120,7 @@ public class FileRecordJobIT {
             }
         }
     }
-    
+
     @Before
     public void setUpDataverse() {
 
@@ -164,7 +166,7 @@ public class FileRecordJobIT {
             String json = IOUtils.toString(classLoader.getResourceAsStream("json/dataset-finch1.json"));
             dsId = given()
                     .header(API_TOKEN_HTTP_HEADER, token)
-                    .body(IOUtils.toString(classLoader.getResourceAsStream("json/dataset-finch1.json")))
+                    .body(json)
                     .contentType("application/json")
                     .post("/api/dataverses/" + testName + "/datasets")
                     .then().assertThat().statusCode(201)
@@ -305,6 +307,104 @@ public class FileRecordJobIT {
         }
     }
 
+    @Test
+    public void testNewEditor() {
+
+        try {
+
+            // create contributor user
+            String contribUser = UUID.randomUUID().toString().substring(0, 8);
+            String contribToken = given()
+                    .body("{" +
+                            "   \"userName\": \"" + contribUser + "\"," +
+                            "   \"firstName\": \"" + contribUser + "\"," +
+                            "   \"lastName\": \"" + contribUser + "\"," +
+                            "   \"email\": \"" + contribUser + "@mailinator.com\"" +
+                            "}")
+                    .contentType(ContentType.JSON)
+                    .request()
+                    .post("/api/builtin-users/secret/" + props.getProperty("builtin.user.key"))
+                    .then().assertThat().statusCode(200)
+                    .extract().jsonPath().getString("data.apiToken");
+
+            Response grantRole = UtilIT.grantRoleOnDataverse(testName, DataverseRole.EDITOR.toString(),
+                    "@" + contribUser, token);
+
+            //grantRole.prettyPrint();
+
+            // create a single test file and put it in two places
+            String file1 =  "testfile.txt";
+            String file2 = "subdir/testfile.txt";
+            File file = createTestFile(dsDir, file1, 0.25);
+            if (file != null) {
+                FileUtils.copyFile(file, new File(dsDir + file2));
+            } else {
+                System.out.println("Unable to copy file: " + dsDir + file2);
+                fail();
+            }
+
+            // mock the checksum manifest
+            String checksum1 = "asfdasdfasdfasdf";
+            String checksum2 = "sgsdgdsgfsdgsdgf";
+            if (file1 != null && file2 != null) {
+                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
+                pw.write(checksum1 + " " + file1);
+                pw.write("\n");
+                pw.write(checksum2 + " " + file2);
+                pw.write("\n");
+                pw.close();
+            } else {
+                fail();
+            }
+
+            // validate job
+            JobExecutionEntity job = getJobWithToken(contribToken);
+            assertEquals(job.getSteps().size(), 2);
+            StepExecutionEntity step1 = job.getSteps().get(0);
+            Map<String, Long> metrics = step1.getMetrics();
+            assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
+            assertEquals(job.getStatus(), BatchStatus.COMPLETED);
+            assertEquals(step1.getExitStatus(), BatchStatus.COMPLETED.name());
+            assertEquals(step1.getStatus(), BatchStatus.COMPLETED);
+            assertEquals(step1.getName(), "import-files");
+            assertEquals((long) metrics.get("write_skip_count"), 0);
+            assertEquals((long) metrics.get("commit_count"), 1);
+            assertEquals((long) metrics.get("process_skip_count"), 0);
+            assertEquals((long) metrics.get("read_skip_count"), 0);
+            assertEquals((long) metrics.get("write_count"), 2);
+            assertEquals((long) metrics.get("rollback_count"), 0);
+            assertEquals((long) metrics.get("filter_count"), 0);
+            assertEquals((long) metrics.get("read_count"), 2);
+            assertEquals(step1.getPersistentUserData(), null);
+
+            // confirm data files were imported
+            updateDatasetJsonPath();
+            List<String> storageIds = new ArrayList<>();
+            storageIds.add(dsPath.getString("data.latestVersion.files[0].dataFile.storageIdentifier"));
+            storageIds.add(dsPath.getString("data.latestVersion.files[1].dataFile.storageIdentifier"));
+            assert(storageIds.contains(file1));
+            assert(storageIds.contains(file2));
+
+            // test the reporting apis
+            given()
+                    .header(API_TOKEN_HTTP_HEADER, contribToken)
+                    .get(props.getProperty("job.status.api") + job.getId())
+                    .then().assertThat()
+                    .body("status", equalTo("COMPLETED"));
+            List<Integer> ids =  given()
+                    .header(API_TOKEN_HTTP_HEADER, contribToken)
+                    .get(props.getProperty("job.status.api"))
+                    .then().extract().jsonPath()
+                    .getList("jobs.id");
+            assertTrue(ids.contains((int)job.getId()));
+
+        } catch (Exception e) {
+            System.out.println("Error testNewEditor: " + e.getMessage());
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     /**
      * Import the same file in different directories, in the same dataset.
      * This is not permitted via HTTP file upload since identical checksums are not allowed in the same dataset.
@@ -357,9 +457,9 @@ public class FileRecordJobIT {
 
             // should return 403
             given()
-                .header(API_TOKEN_HTTP_HEADER, unauthToken)
-                .post(props.getProperty("filesystem.api") + "/" + dsDoi)
-                .then().assertThat().statusCode(403);
+                    .header(API_TOKEN_HTTP_HEADER, unauthToken)
+                    .post(props.getProperty("filesystem.api") + "/" + dsDoi)
+                    .then().assertThat().statusCode(403);
 
             // delete unauthorized user
             given().header(API_TOKEN_HTTP_HEADER, token)
@@ -372,141 +472,141 @@ public class FileRecordJobIT {
             fail();
         }
     }
-    
-    @Test
-    /**
-     * Delete a file in REPLACE mode
-     */
-    public void testDeleteFileInReplaceMode() {
 
-        try {
-
-            // create a single test file and put it in two places
-            String file1 =  "testfile.txt";
-            String file2 = "subdir/testfile.txt";
-            File file = createTestFile(dsDir, file1, 0.25);
-            if (file != null) {
-                FileUtils.copyFile(file, new File(dsDir + file2));
-            } else {
-                System.out.println("Unable to copy file: " + dsDir + file2);
-                fail();
-            }
-
-            // mock the checksum manifest
-            String checksum1 = "asfdasdfasdfasdf";
-            String checksum2 = "sgsdgdsgfsdgsdgf";
-            if (file1 != null && file2 != null) {
-                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
-                pw.write(checksum1 + " " + file1);
-                pw.write("\n");
-                pw.write(checksum2 + " " + file2);
-                pw.write("\n");
-                pw.close();
-            } else {
-                fail();
-            }
-
-            // validate job
-            JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
-            StepExecutionEntity step1 = job.getSteps().get(0);
-            Map<String, Long> metrics = step1.getMetrics();
-            assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(job.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(step1.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(step1.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(step1.getName(), "import-files");
-            assertEquals((long) metrics.get("write_skip_count"), 0);
-            assertEquals((long) metrics.get("commit_count"), 1);
-            assertEquals((long) metrics.get("process_skip_count"), 0);
-            assertEquals((long) metrics.get("read_skip_count"), 0);
-            assertEquals((long) metrics.get("write_count"), 2);
-            assertEquals((long) metrics.get("rollback_count"), 0);
-            assertEquals((long) metrics.get("filter_count"), 0);
-            assertEquals((long) metrics.get("read_count"), 2);
-            assertEquals(step1.getPersistentUserData(), null);
-
-            // confirm data files were imported
-            updateDatasetJsonPath();
-            List<String> storageIds = new ArrayList<>();
-            storageIds.add(dsPath.getString("data.latestVersion.files[0].dataFile.storageIdentifier"));
-            storageIds.add(dsPath.getString("data.latestVersion.files[1].dataFile.storageIdentifier"));
-            assert(storageIds.contains(file1));
-            assert(storageIds.contains(file2));
-
-            // test the reporting apis
-            given()
-                    .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("job.status.api") + job.getId())
-                    .then().assertThat()
-                    .body("status", equalTo("COMPLETED"));
-            List<Integer> ids =  given()
-                    .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("job.status.api"))
-                    .then().extract().jsonPath()
-                    .getList("jobs.id");
-            assertTrue(ids.contains((int)job.getId()));
-
-
-            // delete one file and run the job again
-            file.delete();
-
-            // mock the checksum manifest
-            if (file1 != null) {
-                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
-                pw.write(checksum1 + " " + file1);
-                pw.write("\n");
-                pw.close();
-            } else {
-                fail();
-            }
-
-            // validate job again
-            JobExecutionEntity newJob = getJobWithMode("REPLACE");
-            assertEquals(newJob.getSteps().size(), 2);
-            StepExecutionEntity newSteps = newJob.getSteps().get(0);
-            Map<String, Long> newMetrics = newSteps.getMetrics();
-            assertEquals(newJob.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(newJob.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(newSteps.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(newSteps.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(newSteps.getName(), "import-files");
-            assertEquals(0, (long) newMetrics.get("write_skip_count"));
-            assertEquals(1, (long) newMetrics.get("commit_count"));
-            assertEquals(0, (long) newMetrics.get("process_skip_count"));
-            assertEquals(0, (long) newMetrics.get("read_skip_count"));
-            assertEquals(1, (long) newMetrics.get("write_count"));
-            assertEquals(0, (long) newMetrics.get("rollback_count"));
-            assertEquals(0, (long) newMetrics.get("filter_count"));
-            assertEquals(1, (long) newMetrics.get("read_count"));
-            assertEquals(newSteps.getPersistentUserData(), null);
-
-            // confirm data files were imported
-            updateDatasetJsonPath();
-            //System.out.println("DATASET JSON: " + dsPath.prettyPrint());
-            List<String> newStorageIds = new ArrayList<>();
-            newStorageIds.add(dsPath.getString("data.latestVersion.files[0].dataFile.storageIdentifier"));
-            assert(newStorageIds.contains(file2)); // should contain subdir/testfile.txt still
-
-            // test the reporting apis
-            given()
-                    .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("job.status.api") + newJob.getId())
-                    .then().assertThat()
-                    .body("status", equalTo("COMPLETED"));
-            List<Integer> newIds =  given()
-                    .header(API_TOKEN_HTTP_HEADER, token)
-                    .get(props.getProperty("job.status.api"))
-                    .then().extract().jsonPath()
-                    .getList("jobs.id");
-            assertTrue(newIds.contains((int)job.getId()));
-
-        } catch (Exception e) {
-            System.out.println("Error testIdenticalFilesInDifferentDirectories: " + e.getMessage());
-            e.printStackTrace();
-            fail();
-        }
-    }
+//    @Test
+//    /**
+//     * Delete a file in REPLACE mode
+//     */
+//    public void testDeleteFileInReplaceMode() {
+//
+//        try {
+//
+//            // create a single test file and put it in two places
+//            String file1 =  "testfile.txt";
+//            String file2 = "subdir/testfile.txt";
+//            File file = createTestFile(dsDir, file1, 0.25);
+//            if (file != null) {
+//                FileUtils.copyFile(file, new File(dsDir + file2));
+//            } else {
+//                System.out.println("Unable to copy file: " + dsDir + file2);
+//                fail();
+//            }
+//
+//            // mock the checksum manifest
+//            String checksum1 = "asfdasdfasdfasdf";
+//            String checksum2 = "sgsdgdsgfsdgsdgf";
+//            if (file1 != null && file2 != null) {
+//                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
+//                pw.write(checksum1 + " " + file1);
+//                pw.write("\n");
+//                pw.write(checksum2 + " " + file2);
+//                pw.write("\n");
+//                pw.close();
+//            } else {
+//                fail();
+//            }
+//
+//            // validate job
+//            JobExecutionEntity job = getJob();
+//            assertEquals(job.getSteps().size(), 2);
+//            StepExecutionEntity step1 = job.getSteps().get(0);
+//            Map<String, Long> metrics = step1.getMetrics();
+//            assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
+//            assertEquals(job.getStatus(), BatchStatus.COMPLETED);
+//            assertEquals(step1.getExitStatus(), BatchStatus.COMPLETED.name());
+//            assertEquals(step1.getStatus(), BatchStatus.COMPLETED);
+//            assertEquals(step1.getName(), "import-files");
+//            assertEquals((long) metrics.get("write_skip_count"), 0);
+//            assertEquals((long) metrics.get("commit_count"), 1);
+//            assertEquals((long) metrics.get("process_skip_count"), 0);
+//            assertEquals((long) metrics.get("read_skip_count"), 0);
+//            assertEquals((long) metrics.get("write_count"), 2);
+//            assertEquals((long) metrics.get("rollback_count"), 0);
+//            assertEquals((long) metrics.get("filter_count"), 0);
+//            assertEquals((long) metrics.get("read_count"), 2);
+//            assertEquals(step1.getPersistentUserData(), null);
+//
+//            // confirm data files were imported
+//            updateDatasetJsonPath();
+//            List<String> storageIds = new ArrayList<>();
+//            storageIds.add(dsPath.getString("data.latestVersion.files[0].dataFile.storageIdentifier"));
+//            storageIds.add(dsPath.getString("data.latestVersion.files[1].dataFile.storageIdentifier"));
+//            assert(storageIds.contains(file1));
+//            assert(storageIds.contains(file2));
+//
+//            // test the reporting apis
+//            given()
+//                    .header(API_TOKEN_HTTP_HEADER, token)
+//                    .get(props.getProperty("job.status.api") + job.getId())
+//                    .then().assertThat()
+//                    .body("status", equalTo("COMPLETED"));
+//            List<Integer> ids =  given()
+//                    .header(API_TOKEN_HTTP_HEADER, token)
+//                    .get(props.getProperty("job.status.api"))
+//                    .then().extract().jsonPath()
+//                    .getList("jobs.id");
+//            assertTrue(ids.contains((int)job.getId()));
+//
+//
+//            // delete one file and run the job again
+//            file.delete();
+//
+//            // mock the checksum manifest
+//            if (file1 != null) {
+//                PrintWriter pw = new PrintWriter(new FileWriter(dsDir + "/files.sha"));
+//                pw.write(checksum1 + " " + file1);
+//                pw.write("\n");
+//                pw.close();
+//            } else {
+//                fail();
+//            }
+//
+//            // validate job again
+//            JobExecutionEntity newJob = getJobWithMode("REPLACE");
+//            assertEquals(newJob.getSteps().size(), 2);
+//            StepExecutionEntity newSteps = newJob.getSteps().get(0);
+//            Map<String, Long> newMetrics = newSteps.getMetrics();
+//            assertEquals(newJob.getExitStatus(), BatchStatus.COMPLETED.name());
+//            assertEquals(newJob.getStatus(), BatchStatus.COMPLETED);
+//            assertEquals(newSteps.getExitStatus(), BatchStatus.COMPLETED.name());
+//            assertEquals(newSteps.getStatus(), BatchStatus.COMPLETED);
+//            assertEquals(newSteps.getName(), "import-files");
+//            assertEquals(0, (long) newMetrics.get("write_skip_count"));
+//            assertEquals(1, (long) newMetrics.get("commit_count"));
+//            assertEquals(0, (long) newMetrics.get("process_skip_count"));
+//            assertEquals(0, (long) newMetrics.get("read_skip_count"));
+//            assertEquals(1, (long) newMetrics.get("write_count"));
+//            assertEquals(0, (long) newMetrics.get("rollback_count"));
+//            assertEquals(0, (long) newMetrics.get("filter_count"));
+//            assertEquals(1, (long) newMetrics.get("read_count"));
+//            assertEquals(newSteps.getPersistentUserData(), null);
+//
+//            // confirm data files were imported
+//            updateDatasetJsonPath();
+//            //System.out.println("DATASET JSON: " + dsPath.prettyPrint());
+//            List<String> newStorageIds = new ArrayList<>();
+//            newStorageIds.add(dsPath.getString("data.latestVersion.files[0].dataFile.storageIdentifier"));
+//            assert(newStorageIds.contains(file2)); // should contain subdir/testfile.txt still
+//
+//            // test the reporting apis
+//            given()
+//                    .header(API_TOKEN_HTTP_HEADER, token)
+//                    .get(props.getProperty("job.status.api") + newJob.getId())
+//                    .then().assertThat()
+//                    .body("status", equalTo("COMPLETED"));
+//            List<Integer> newIds =  given()
+//                    .header(API_TOKEN_HTTP_HEADER, token)
+//                    .get(props.getProperty("job.status.api"))
+//                    .then().extract().jsonPath()
+//                    .getList("jobs.id");
+//            assertTrue(newIds.contains((int)job.getId()));
+//
+//        } catch (Exception e) {
+//            System.out.println("Error testIdenticalFilesInDifferentDirectories: " + e.getMessage());
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 
     @Test
     /**
@@ -987,33 +1087,33 @@ public class FileRecordJobIT {
         try {
 
             RestAssured.urlEncodingEnabled = false;
-            
+
             // publish the dataverse
             System.out.println("DATAVERSE: http://localhost:8080/api/dataverses/"+testName+"/actions/:publish?key="+token);
             given().body("{}").contentType("application/json")
                     .post("/api/dataverses/" + testName + "/actions/:publish?key="+token)
                     .then().assertThat().statusCode(200);
-            
+
             // publish the dataset
             System.out.println("DATASET: http://localhost:8080/api/datasets/"+dsId+"/actions/:publish?type=major&key="+token);
             given()
                     .get("/api/datasets/" + dsId + "/actions/:publish?type=major&key="+token)
                     .then().assertThat().statusCode(200);
-            
+
             isDraft = false;
-            
+
             JsonPath jsonPath = getFaileJobJson();
             assertTrue(jsonPath.getString("status").equalsIgnoreCase("ERROR"));
             assertTrue(jsonPath.getString("message").contains("Dataset isn't in DRAFT mode."));
-            
+
         } catch (Exception e) {
             System.out.println("Error testChecksumImport: " + e.getMessage());
             e.printStackTrace();
             fail();
         }
     }
-    
-    
+
+
 //  todo: figure out how to create a new version using the native api - sorry, i can't get this to work...
 //    @Test
 //    /**
@@ -1080,7 +1180,7 @@ public class FileRecordJobIT {
             fail();
         }
     }
-    
+
     // UTILS
 
     /***
@@ -1221,7 +1321,7 @@ public class FileRecordJobIT {
                 .extract().jsonPath();
         return jsonPath;
     }
-    
+
     /**
      * Kick off a job with default mode (MERGE)
      * @return a job execution entity

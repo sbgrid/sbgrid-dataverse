@@ -3,10 +3,12 @@ package edu.harvard.iq.dataverse.api.batchjob;
 import edu.harvard.iq.dataverse.Dataset;
 import edu.harvard.iq.dataverse.DatasetServiceBean;
 import edu.harvard.iq.dataverse.DatasetVersion;
+import edu.harvard.iq.dataverse.DataverseRequestServiceBean;
 import edu.harvard.iq.dataverse.PermissionServiceBean;
 import edu.harvard.iq.dataverse.api.AbstractApiBean;
 import edu.harvard.iq.dataverse.authorization.Permission;
 import edu.harvard.iq.dataverse.authorization.users.AuthenticatedUser;
+import edu.harvard.iq.dataverse.engine.command.impl.UpdateDatasetCommand;
 
 import javax.batch.operations.JobOperator;
 import javax.batch.operations.JobSecurityException;
@@ -42,7 +44,7 @@ public class FileRecordJobResource extends AbstractApiBean {
 
     @EJB
     DatasetServiceBean datasetService;
-
+    
     @POST
     @Path("import/datasets/files/{doi1}/{doi2}/{doi3}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -59,13 +61,17 @@ public class FileRecordJobResource extends AbstractApiBean {
                 AuthenticatedUser user = findAuthenticatedUserOrDie();
                 /**
                  * Current constraints:
-                 * 1. valid dataset
-                 * 2. valid dataset directory
-                 * 3. valid user & user has edit dataset permission
-                 * 4. only one dataset version
-                 * 5. dataset version is draft
+                 * 1. only supports merge mode
+                 * 2. valid dataset
+                 * 3. valid dataset directory
+                 * 4. valid user & user has edit dataset permission
+                 * 5. only one dataset version
+                 * 6. dataset version is draft
                  */
 
+                if (!mode.equalsIgnoreCase("MERGE")) {
+                    return error(Response.Status.NOT_IMPLEMENTED, "Import mode: " + mode + " is not currently supported.");
+                }
                 if (dataset == null) {
                     return error(Response.Status.BAD_REQUEST, "Can't find dataset with ID: " + doi);
                 }
@@ -75,7 +81,11 @@ public class FileRecordJobResource extends AbstractApiBean {
                     return error(Response.Status.BAD_REQUEST, "Dataset directory is invalid.");    
                 }
 
-                if (user == null || !permissionServiceBean.userOn(user, dataset.getOwner()).has(Permission.EditDataset)) {
+                // check if user has permission to update the dataset
+                boolean canIssueCommand = permissionServiceBean
+                        .requestOn(this.createDataverseRequest(user), 
+                                dataset).canIssue(UpdateDatasetCommand.class);
+                if (!canIssueCommand) {
                     logger.log(Level.SEVERE, "User doesn't have permission to import files into this dataset.");
                     return error(Response.Status.FORBIDDEN, "User is not authorized.");                    }
 
