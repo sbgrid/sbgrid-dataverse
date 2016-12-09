@@ -17,6 +17,30 @@ public class DatacitePerson {
     String nameIdentifierSchemeUri;
     String role;
 
+    public enum RoleType { 
+        ContactPerson, 
+        DataCollector, 
+        DataCurator, 
+        DataManager, 
+        Distributor, 
+        Editor, 
+        HostingInstitution, 
+        Other, 
+        Producer, 
+        ProjectLeader, 
+        ProjectManager, 
+        ProjectMember, 
+        RegistrationAgency, 
+        RegistrationAuthority, 
+        RelatedPerson, 
+        ResearchGroup, 
+        RightsHolder, 
+        Researcher, 
+        Sponsor, 
+        Supervisor, 
+        WorkPackageLeader
+    }
+
     public DatacitePerson() {}
     
     public DatacitePerson(String name) {
@@ -84,7 +108,21 @@ public class DatacitePerson {
     }
 
     public void setRole(String role) {
-        this.role = role;
+        // need to convert 'Data Collector' to 'DataCollector'
+        role = role.replaceAll("\\s+","");
+        // check if in role type
+        boolean found = false;
+        for (RoleType type : RoleType.values()) {
+            if (type.name().equals(role)) {
+                found = true;
+                break;
+            }
+        }
+        if (found)  {
+            this.role = role;    
+        } else {
+            this.role = "Other";
+        }
     }
 
     public static List<DatacitePerson> getDatacitePersons(DatasetField datasetField) {
