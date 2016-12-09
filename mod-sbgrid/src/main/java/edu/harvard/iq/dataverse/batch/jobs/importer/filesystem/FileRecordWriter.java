@@ -1,6 +1,7 @@
 package edu.harvard.iq.dataverse.batch.jobs.importer.filesystem;
 
 import edu.harvard.iq.dataverse.DataFile;
+import edu.harvard.iq.dataverse.DataFileServiceBean;
 import edu.harvard.iq.dataverse.Dataset;
 import edu.harvard.iq.dataverse.DatasetServiceBean;
 import edu.harvard.iq.dataverse.DatasetVersion;
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
 @Named
 @Dependent
 public class FileRecordWriter extends AbstractItemWriter {
-    
+
     private static final Logger logger = Logger.getLogger(FileRecordWriter.class.getName());
 
     @Inject
@@ -63,7 +64,10 @@ public class FileRecordWriter extends AbstractItemWriter {
 
     @EJB
     EjbDataverseEngine commandEngine;
-    
+
+    @EJB
+    DataFileServiceBean dataFileServiceBean;
+
     Dataset dataset;
     AuthenticatedUser user;
     private String persistentUserData = "";
@@ -79,7 +83,7 @@ public class FileRecordWriter extends AbstractItemWriter {
     @Override
     public void close() {
         // update the dataset
-        updateDatasetVersion(dataset.getLatestVersion());
+        // updateDatasetVersion(dataset.getLatestVersion());
         if (!persistentUserData.isEmpty()) {
             stepContext.setPersistentUserData(persistentUserData);
         }
@@ -93,17 +97,17 @@ public class FileRecordWriter extends AbstractItemWriter {
         }
         dataset.getLatestVersion().getDataset().setFiles(datafiles);
     }
-    
+
     // utils
     /**
      * Update the dataset version using the command engine so permissions and constraints are enforced.
      * Log errors to both the glassfish log and inside the job step's persistentUserData
-     * 
+     *
      * @param version dataset version
-     *        
+     *
      */
     private void updateDatasetVersion(DatasetVersion version) {
-    
+
         // update version using the command engine to enforce user permissions and constraints
         if (dataset.getVersions().size() == 1 && version.getVersionState() == DatasetVersion.VersionState.DRAFT) {
             try {
@@ -121,9 +125,9 @@ public class FileRecordWriter extends AbstractItemWriter {
             logger.log(Level.SEVERE, constraintError);
             persistentUserData += constraintError + " ";
         }
-       
-    } 
-    
+
+    }
+
     /**
      * Create a DatasetFile and corresponding FileMetadata for a file on the filesystem and add it to the
      * latest dataset version (if the user has AddDataset permissions for the dataset).
@@ -131,7 +135,7 @@ public class FileRecordWriter extends AbstractItemWriter {
      * @return datafile
      */
     private DataFile createDataFile(File file) {
-        
+
         DatasetVersion version = dataset.getLatestVersion();
         String path = file.getAbsolutePath();
         String gid = dataset.getAuthority() + dataset.getDoiSeparator() + dataset.getIdentifier();
@@ -144,7 +148,7 @@ public class FileRecordWriter extends AbstractItemWriter {
         datafile.setPermissionModificationTime(new Timestamp(new Date().getTime()));
         datafile.setOwner(dataset);
         datafile.setIngestDone();
-        
+
         // check system property first, otherwise use the batch job property
         String jobChecksumType;
         if (System.getProperty("checksumType") != null) {
@@ -174,7 +178,9 @@ public class FileRecordWriter extends AbstractItemWriter {
         version.getFileMetadatas().add(fmd);
         fmd.setDatasetVersion(version);
 
+        datafile = dataFileServiceBean.save(datafile);
+
         return datafile;
     }
-    
+
 }
