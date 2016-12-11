@@ -16,7 +16,7 @@
     <div id="rsyncUploadBlock"
          class="panel panel-default margin-bottom"
          style="width: 90%; margin: 20px auto;"
-         jsf:rendered="#{(DatasetPage.fileMetadatasSearch.size() eq 0) and (DatasetPage.dataset.getRsyncScript().length() gt 0)}">
+         jsf:rendered="#{(DatasetPage.fileMetadatasSearch.size() eq 0) and (DatasetPage.dataset.getDcmValue().length() gt 0)}">
         <div class="panel-body">
             <p style="font-size: 1.3em; color: #808080; padding: 20px; text-align: center">
                 #{bundle['file.fromRsync.heading']}
@@ -55,7 +55,7 @@
                  jsf:rendered="#{(!(empty DatasetPage.workingVersion.fileMetadatas)
                                     and DatasetPage.workingVersion.fileMetadatas.size() > 1)
                                     and DatasetPage.downloadButtonAvailable
-                                    and (DatasetPage.dataset.getRsyncScript().length() gt 0)}">
+                                    and (DatasetPage.dataset.getDcmValue().length() gt 0)}">
                 <div style="color: #31708f; font-weight: 700; margin-bottom: 20px;">Download Instructions</div>
                 <p style='color: #616161'>1. If this dataset is locally available, it should be accessable at <code style='color:#000000'>/programs/datagrid/#{DatasetPage.dataset.identifier}</code></p>
                 <p style="color: #616161"> 2. To download this dataset, please run the following command from your Terminal on a Linux or OS X workstation:</p>
@@ -69,7 +69,7 @@
             </div>
 
             <div jsf:id="filesHeaderBlock" class="row"
-                 jsf:rendered="#{(DatasetPage.fileMetadatasSearch.size() gt 0) or (DatasetPage.dataset.getRsyncScript() == null)}">
+                 jsf:rendered="#{(DatasetPage.fileMetadatasSearch.size() gt 0) or (DatasetPage.dataset.getDcmValue() == null)}">
                 <div class="form-horizontal col-sm-7 col-xs-9 text-left">
                     <div class="form-group">
                         <div class="col-xs-8">
@@ -148,7 +148,7 @@
 
                         <div jsf:id="downloadButtonBlock" class="btn-group" jsf:rendered="#{(!(empty DatasetPage.workingVersion.fileMetadatas)
                                                                and DatasetPage.workingVersion.fileMetadatas.size() > 1) and DatasetPage.downloadButtonAvailable
-                                                               and (DatasetPage.dataset.getRsyncScript().length() lt 1) }">
+                                                               and (DatasetPage.dataset.getDcmValue().length() lt 1) }">
                             <p:commandLink rendered="#{!(DatasetPage.downloadPopupRequired)}"
                                            type="button" styleClass="btn btn-default"
                                            disabled="#{DatasetPage.locked}"
