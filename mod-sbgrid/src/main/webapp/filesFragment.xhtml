@@ -339,22 +339,6 @@
                     </span>
                 </ui:fragment>
                 
-                <!-- WorldMap Map Data button group -->
-                <!-- 4.2.1: VERIFIED: none of these checks add any queries, if there are no map layers. -->
-                <div class="btn-group" role="group" jsf:rendered="#{DatasetPage.canUserSeeMapDataButton(fileMetadata) or DatasetPage.canSeeMapButtonReminderToPublish(fileMetadata)}">
-                    <!-- WorldMap Map Data -->
-                    <h:outputLink pt:role="button" rendered="#{DatasetPage.canUserSeeMapDataButton(fileMetadata)}"
-                                  type="button" styleClass="btn btn-default" value="#{fileMetadata.dataFile.getMapItURL(dataverseSession.user.id)}" role="button">
-                        <span class="glyphicon glyphicon-map-marker"/> #{bundle['file.mapData']}
-                    </h:outputLink>
-                    <!-- Unpublished Map Data -->
-                    <ui:fragment rendered="#{DatasetPage.canSeeMapButtonReminderToPublish(fileMetadata)}">
-                        <button type="button" class="btn btn-default" onclick="PF('mapData_popup').show()">
-                            <span class="glyphicon glyphicon-map-marker"/> #{bundle['file.mapData']}
-                        </button>
-                    </ui:fragment>
-                </div>
-
                 <!-- non-tabular data file: -->
                 <!-- no guest book/terms of use/etc. - straight to the download API url: -->
                 <p:commandLink rendered="#{ DatasetPage.canDownloadFile(fileMetadata) and !(fileMetadata.dataFile.tabularData) and !(DatasetPage.downloadPopupRequired) }"
