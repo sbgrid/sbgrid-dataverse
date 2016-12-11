@@ -327,161 +327,18 @@
         <p:column class="col-file-action text-right" rendered="#{!(DatasetPage.editMode == 'FILE' or DatasetPage.editMode == 'CREATE')}">
             <!-- Ingest in progress... -->
             <div id="txtInprogess" class="bg-info text-info text-center margin-bottom-half" jsf:rendered="#{fileMetadata.dataFile.ingestInProgress}">
-                #{bundle['file.ingestInproGress']}
+                #{bundle['file.ingestInProgress']}
             </div>
 
             <div class="button-block">
-                <!-- Ingest Problem - this is the infamous "red triangle" error. As of 4.2, we only want to show it to the owner of the dataset: -->
-                <ui:fragment rendered="#{fileMetadata.dataFile.ingestProblem and DatasetPage.sessionUserAuthenticated
-                                             and DatasetPage.canUpdateDataset()}">
-                    <span class="ingest-warning" data-toggle="popover" data-container="body" data-trigger="hover" data-placement="left" data-html="true" data-title="&lt;span class='text-danger h5'&gt;#{bundle['file.ingestFailed']}&lt;/span&gt;" data-content="&lt;span class='text-danger'&gt;#{fileMetadata.dataFile.ingestReportMessage}&lt;/span&gt;">
-                        <span class="glyphicon glyphicon-warning-sign text-danger"/>
-                    </span>
-                </ui:fragment>
-                
-                <!-- non-tabular data file: -->
-                <!-- no guest book/terms of use/etc. - straight to the download API url: -->
-                <p:commandLink rendered="#{ DatasetPage.canDownloadFile(fileMetadata) and !(fileMetadata.dataFile.tabularData) and !(DatasetPage.downloadPopupRequired) }"
-                               type="button" styleClass="btn btn-default"
-                               actionListener="#{DatasetPage.startFileDownload(fileMetadata, '')}">
-                    <span class="glyphicon glyphicon-download-alt"/> #{bundle.download}
-                </p:commandLink>
-                <!-- guest book or terms of use, etc. enabled - open "download popup" first: -->
-                <p:commandLink rendered="#{ DatasetPage.canDownloadFile(fileMetadata) and !(fileMetadata.dataFile.tabularData) and DatasetPage.downloadPopupRequired }"
-                               type="button" styleClass="btn btn-default"
-                               action="#{DatasetPage.initGuestbookResponse(fileMetadata)}"
-                               update="@form" oncomplete="PF('downloadPopup').show();handleResizeDialog('downloadPopup');">
-                    <span class="glyphicon glyphicon-download-alt"/> #{bundle.download}
-                </p:commandLink>
-
-                <!-- Download Dropdown -->
-                <div class="btn-group" jsf:rendered="#{ DatasetPage.canDownloadFile(fileMetadata) and fileMetadata.dataFile.tabularData }">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                        <span class="glyphicon glyphicon-download-alt"/> #{bundle.download} <span class="caret"/>
-                    </button>
-                    <ul class="dropdown-menu multi-level pull-right text-left" role="menu">
-                        <ui:remove>
-                            <li>
-                                <p:commandLink styleClass="highlightBold" rendered="#{!(DatasetPage.downloadPopupRequired)}"
-                                               actionListener="#{DatasetPage.startFileDownload(fileMetadata, 'bundle')}">
-                                    #{bundle['file.downloadBtn.format.all']}
-                                </p:commandLink>
-                                <p:commandLink styleClass="highlightBold" rendered="#{DatasetPage.downloadPopupRequired}"
-                                               action="#{DatasetPage.initGuestbookResponse(fileMetadata, 'bundle')}"
-                                               update="@form"
-                                               oncomplete="PF('downloadPopup').show();handleResizeDialog('downloadPopup');">
-                                    #{bundle['file.downloadBtn.format.all']}
-                                </p:commandLink>
-                            </li>
-                            <li role="presentation" class="divider"></li>
-                        </ui:remove>
-                        <li>
-                            <p:commandLink rendered="#{!(DatasetPage.downloadPopupRequired)}"
-                                           actionListener="#{DatasetPage.startFileDownload(fileMetadata, 'original')}">
-                                <h:outputFormat value="#{bundle['file.downloadBtn.format.original']}">
-                                    <f:param value="#{fileMetadata.dataFile.originalFormatLabel}"/>
-                                </h:outputFormat>
-                            </p:commandLink>
-                            <p:commandLink rendered="#{DatasetPage.downloadPopupRequired}"
-                                           action="#{DatasetPage.initGuestbookResponse(fileMetadata, 'original')}"
-                                           update="@form"
-                                           oncomplete="PF('downloadPopup').show();handleResizeDialog('downloadPopup');">
-                                <h:outputFormat value="#{bundle['file.downloadBtn.format.original']}">
-                                    <f:param value="#{fileMetadata.dataFile.originalFormatLabel}"/>
-                                </h:outputFormat>
-                            </p:commandLink>
-                        </li>
-                        <li>
-                            <p:commandLink rendered="#{!(DatasetPage.downloadPopupRequired)}"
-                                           actionListener="#{DatasetPage.startFileDownload(fileMetadata, 'tab')}">
-                                #{bundle['file.downloadBtn.format.tab']}
-                            </p:commandLink>
-                            <p:commandLink rendered="#{DatasetPage.downloadPopupRequired}"
-                                           action="#{DatasetPage.initGuestbookResponse(fileMetadata, 'tab')}"
-                                           update="@form"
-                                           oncomplete="PF('downloadPopup').show();handleResizeDialog('downloadPopup');">
-                                #{bundle['file.downloadBtn.format.tab']}
-                            </p:commandLink>
-                        </li>
-                        <ui:fragment rendered="#{!(fileMetadata.dataFile.originalFormatLabel == 'RData')}">
-                            <li>
-                                <p:commandLink rendered="#{!(DatasetPage.downloadPopupRequired)}"
-                                               actionListener="#{DatasetPage.startFileDownload(fileMetadata, 'RData')}">
-                                    #{bundle['file.downloadBtn.format.rdata']}
-                                </p:commandLink>
-                                <p:commandLink rendered="#{DatasetPage.downloadPopupRequired}"
-                                               action="#{DatasetPage.initGuestbookResponse(fileMetadata, 'RData')}"
-                                               update="@form"
-                                               oncomplete="PF('downloadPopup').show();handleResizeDialog('downloadPopup');">
-                                    #{bundle['file.downloadBtn.format.rdata']}
-                                </p:commandLink>
-                            </li>
-                        </ui:fragment>
-                        <li>
-                            <p:commandLink rendered="#{!(DatasetPage.downloadPopupRequired)}"
-                                           actionListener="#{DatasetPage.startFileDownload(fileMetadata, 'var')}">
-                                #{bundle['file.downloadBtn.format.var']}
-                            </p:commandLink>
-                            <p:commandLink rendered="#{DatasetPage.downloadPopupRequired}"
-                                           action="#{DatasetPage.initGuestbookResponse(fileMetadata, 'var')}"
-                                           update="@form"
-                                           oncomplete="PF('downloadPopup').show();handleResizeDialog('downloadPopup');">
-                                #{bundle['file.downloadBtn.format.var']}
-                            </p:commandLink>
-                        </li>
-                        <li>
-                            <p:commandLink id="fileDowloadDataSubsetButton" rendered="#{!(DatasetPage.downloadPopupRequired)}"
-                                           actionListener="#{DatasetPage.setFileMetadataSelected(fileMetadata, 'create')}"
-                                           update=":datasetForm:downloadDataSubsetPopup"
-                                           oncomplete="PF('downloadDataSubsetPopup').show()"
-                                           value="Data Subset"
-                                           disabled="#{empty fileMetadata.dataFile.id}"/>
-                            <p:commandLink id="fileDowloadDataSubsetButtonPopupReq" rendered="#{(DatasetPage.downloadPopupRequired)}"
-                                           actionListener="#{DatasetPage.setFileMetadataSelected(fileMetadata, 'init')}"
-                                           update="@form"
-                                           oncomplete="PF('downloadPopup').show()"
-                                           value="Data Subset"
-                                           disabled="#{empty fileMetadata.dataFile.id}"/>
-                        </li>
-                        <li class="dropdown-submenu pull-left">
-                            <a tabindex="-1" href="javascript:void(0);">#{bundle['file.downloadBtn.format.citation']}</a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <h:commandLink id="risLinkFile" actionListener="#{DatasetPage.downloadDatafileCitationRIS(fileMetadata)}">
-                                        <h:outputText value="#{bundle['dataset.cite.downloadBtn.ris']}" />
-                                    </h:commandLink>
-                                </li>
-                                <li>
-                                    <h:commandLink id="endNoteLinkFile" action="#{DatasetPage.downloadDatafileCitationXML(fileMetadata)}">
-                                        <h:outputText value="#{bundle['dataset.cite.downloadBtn.xml']}" />
-                                    </h:commandLink>
-                                </li>
-                                <li>
-                                    <h:commandLink id="bibLinkFile" action="#{DatasetPage.downloadDatafileCitationBibtex(fileMetadata)}">
-                                        <h:outputText value="#{bundle['dataset.cite.downloadBtn.bib']}" />
-                                    </h:commandLink>
-                                </li>
-
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <!-- Request Access -->
-                <!-- 4.2.1 - TODO: retest this on a dataset with fileRequest enabled and with some files restricted to the user -->
-                <!-- 4.2.1 - TODO: make sure dataFile.fileAccessRequesters gets populated -->
-                <p:commandLink type="button" styleClass="btn btn-default" rendered="#{DatasetPage.sessionUserAuthenticated and DatasetPage.dataset.fileAccessRequest and !(DatasetPage.canDownloadFile(fileMetadata))}"
-                               actionListener="#{DatasetPage.requestAccess(fileMetadata.dataFile, true)}"
-                               update="filesTable"
-                               disabled="#{fileMetadata.dataFile.fileAccessRequesters.contains(dataverseSession.user)}">
-                    <span class="glyphicon glyphicon-bullhorn"/> #{fileMetadata.dataFile.fileAccessRequesters.contains(dataverseSession.user) ? bundle['file.accessRequested'] : bundle['file.requestAccess']}
-                </p:commandLink>
-                <!-- 4.2.1 - TODO: retest this on a dataset with fileRequest enabled and with some files restricted to the user -->
-                <p:commandLink type="button" styleClass="btn btn-default" rendered="#{!DatasetPage.sessionUserAuthenticated and DatasetPage.dataset.fileAccessRequest and !(DatasetPage.canDownloadFile(fileMetadata))}"
-                               onclick="PF('accessSignUpLogIn_popup').show()">
-                    <span class="glyphicon glyphicon-bullhorn"/> #{fileMetadata.dataFile.fileAccessRequesters.contains(dataverseSession.user) ? bundle['file.accessRequested'] : bundle['file.requestAccess']}
-                </p:commandLink>
-
-
+                <ui:include src="file-download-button-fragment.xhtml">
+                    <ui:param name="fileMetadata" value="#{fileMetadata}"/>
+                    <ui:param name="canUpdateDataset" value="#{DatasetPage.canUpdateDataset()}"/>
+                    <ui:param name="downloadPopupRequired" value="#{DatasetPage.downloadPopupRequired}"/>
+                    <ui:param name="guestbookResponse" value="#{DatasetPage.guestbookResponse}"/>
+                    <ui:param name="guestbookResponseService" value="#{DatasetPage.guestbookResponseService}"/>
+                    <ui:param name="fileDownloadService" value="#{DatasetPage.fileDownloadService}"/>
+                </ui:include>
             </div>
             <!-- END: button-block -->
         </p:column>
