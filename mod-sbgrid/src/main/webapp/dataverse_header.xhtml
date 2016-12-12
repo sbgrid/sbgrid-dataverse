@@ -205,6 +205,7 @@
         </div>
 
         <div id="breadcrumbNavBlock" class="container" jsf:rendered="#{dataverseHeaderFragment.breadcrumbs.size() > 1}">
+            <o:importFunctions type="java.lang.String" var="s" />
             <ui:repeat value="#{dataverseHeaderFragment.breadcrumbs}" var="breadcrumb" varStatus="status">
                 <h:outputText value=" > " styleClass="breadcrumbCarrot" rendered="#{!status.first}"/>
                 <div class="breadcrumbBlock">
@@ -214,19 +215,19 @@
                         <ui:fragment rendered="#{breadcrumb.dvObject == null and !empty breadcrumb.url}">
                             <ui:remove><!-- No widget code for admin pgs that would never display in widget --></ui:remove>
                             <a id="breadcrumbLnk#{status.index}" href="${breadcrumb.url}">
-                                <h:outputText value="#{breadcrumb.breadcrumbText}"/>
+                                <h:outputText value="#{s.replace(breadcrumb.breadcrumbText, ' Dataverse', '')}"/>
                             </a>
                         </ui:fragment>
                         <ui:fragment rendered="#{breadcrumb.dvObject.instanceofDataverse}">
                             <c:set var="dvUrl" value="/dataverse/#{breadcrumb.dvObject.alias}"/>
                             <a id="breadcrumbLnk#{status.index}" href="#{widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? widgetWrapper.wrapURL(dvUrl) : dvUrl}" target="#{!widgetWrapper.widgetView or widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? '' : '_blank'}">
-                                <h:outputText value="#{breadcrumb.breadcrumbText}"/>
+                                <h:outputText value="#{s.replace(breadcrumb.breadcrumbText, ' Dataverse', '')}"/>
                             </a>
                         </ui:fragment>
                         <ui:fragment rendered="#{breadcrumb.dvObject.instanceofDataset}">
                             <c:set var="dsUrl" value="/dataset.xhtml?persistentId=#{breadcrumb.dvObject.globalId}#{breadcrumb.optionalUrlExtension }"/>
                             <a id="breadcrumbLnk#{status.index}" href="#{widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? widgetWrapper.wrapURL(dsUrl) : dsUrl}" target="#{!widgetWrapper.widgetView or widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? '' : '_blank'}">
-                                <h:outputText value="#{breadcrumb.breadcrumbText}"/>
+                                <h:outputText value="#{s.replace(breadcrumb.breadcrumbText, ' Dataverse', '')}"/>
                             </a>
                         </ui:fragment>
                     </ui:fragment>
