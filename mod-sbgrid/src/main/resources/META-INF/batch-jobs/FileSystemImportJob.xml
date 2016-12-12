@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="FileSystemImportJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+
+    <properties>
+        <property name="job-checksumManifest" value="files.sha"/>
+        <property name="job-checksumType" value="SHA1"/>
+    </properties>
+
+    <listeners>
+        <listener ref="fileRecordJobListener" />
+    </listeners>
+
+    <step id="import-files" next="import-checksums">
+        <listeners>
+            <listener ref="fileRecordJobListener"/>
+        </listeners>
+        <chunk>
+            <reader ref="fileRecordReader">
+                <properties>
+                    <property name="excludes" value="*.DS_Store, *.sha, *.cached"/>
+                </properties>
+            </reader>
+            <processor ref="fileRecordProcessor"/>
+            <writer ref="fileRecordWriter">
+                <properties>
+                    <property name="checksumType" value="#{jobProperties['job-checksumType']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="import-checksums">
+        <chunk>
+            <reader ref="checksumReader">
+                <properties>
+                    <property name="checksumManifest" value="#{jobProperties['job-checksumManifest']}"/>
+                    <property name="checksumType" value="#{jobProperties['job-checksumType']}"/>
+                </properties>
+            </reader>
+            <processor ref="checksumProcessor"/>
+            <writer ref="checksumWriter"/>
+        </chunk>
+    </step>
+
+</job>
