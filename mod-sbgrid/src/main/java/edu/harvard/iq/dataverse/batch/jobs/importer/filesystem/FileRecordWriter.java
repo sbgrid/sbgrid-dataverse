@@ -95,15 +95,16 @@ public class FileRecordWriter extends AbstractItemWriter {
             stepContext.setExitStatus("FAILED");
         }
 
-        // check permissions       
-        boolean canIssueCommand = permissionServiceBean
-                .requestOn(new DataverseRequest(user, (HttpServletRequest) null), dataset)
-                .canIssue(UpdateDatasetCommand.class);
-        if (!canIssueCommand) {
-            persistentUserData += "ERROR: user doesn't have permission to update the dataset. ";
-            stepContext.setPersistentUserData(persistentUserData);
-            stepContext.setExitStatus("FAILED");
-        }
+        // check permissions   
+        // sorry, this continues to produce javax.transaction.RollbackException
+//        boolean canIssueCommand = permissionServiceBean
+//                .requestOn(new DataverseRequest(user, (HttpServletRequest) null), dataset)
+//                .canIssue(UpdateDatasetCommand.class);
+//        if (!canIssueCommand) {
+//            persistentUserData += "ERROR: user doesn't have permission to update the dataset. ";
+//            stepContext.setPersistentUserData(persistentUserData);
+//            stepContext.setExitStatus("FAILED");
+//        }
     }
 
     @Override
