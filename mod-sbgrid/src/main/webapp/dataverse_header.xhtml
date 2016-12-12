@@ -7,6 +7,7 @@
                 xmlns:jsf="http://xmlns.jcp.org/jsf"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:o="http://omnifaces.org/ui"
+                xmlns:of="http://omnifaces.org/functions"
                 xmlns:iqbs="http://xmlns.jcp.org/jsf/composite/iqbs">
 
     <div id="dataverse-header-block">
@@ -205,29 +206,28 @@
         </div>
 
         <div id="breadcrumbNavBlock" class="container" jsf:rendered="#{dataverseHeaderFragment.breadcrumbs.size() > 1}">
-            <o:importFunctions type="java.lang.String" var="s" />
             <ui:repeat value="#{dataverseHeaderFragment.breadcrumbs}" var="breadcrumb" varStatus="status">
                 <h:outputText value=" > " styleClass="breadcrumbCarrot" rendered="#{!status.first}"/>
                 <div class="breadcrumbBlock">
-                    <h:outputText value="#{breadcrumb.breadcrumbText}" styleClass="#{'breadcrumbActive'}" rendered="#{status.last}"/>
+                    <h:outputText value="#{of:replaceAll(breadcrumb.breadcrumbText, ' Dataverse$', '')}" styleClass="#{'breadcrumbActive'}" rendered="#{status.last}"/>
                     <ui:fragment rendered="#{!status.last}">
                         <h:outputText value="#{breadcrumb.breadcrumbText}" rendered="#{!breadcrumb.dvObject.instanceofDataverse and !breadcrumb.dvObject.instanceofDataset and empty breadcrumb.url}"/>
                         <ui:fragment rendered="#{breadcrumb.dvObject == null and !empty breadcrumb.url}">
                             <ui:remove><!-- No widget code for admin pgs that would never display in widget --></ui:remove>
                             <a id="breadcrumbLnk#{status.index}" href="${breadcrumb.url}">
-                                <h:outputText value="#{s.replace(breadcrumb.breadcrumbText, ' Dataverse', '')}"/>
+                                <h:outputText value="#{breadcrumb.breadcrumbText}"/>
                             </a>
                         </ui:fragment>
                         <ui:fragment rendered="#{breadcrumb.dvObject.instanceofDataverse}">
                             <c:set var="dvUrl" value="/dataverse/#{breadcrumb.dvObject.alias}"/>
                             <a id="breadcrumbLnk#{status.index}" href="#{widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? widgetWrapper.wrapURL(dvUrl) : dvUrl}" target="#{!widgetWrapper.widgetView or widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? '' : '_blank'}">
-                                <h:outputText value="#{s.replace(breadcrumb.breadcrumbText, ' Dataverse', '')}"/>
+                                <h:outputText value="#{of:replaceAll(breadcrumb.breadcrumbText, ' Dataverse$', '')}"/>
                             </a>
                         </ui:fragment>
                         <ui:fragment rendered="#{breadcrumb.dvObject.instanceofDataset}">
                             <c:set var="dsUrl" value="/dataset.xhtml?persistentId=#{breadcrumb.dvObject.globalId}#{breadcrumb.optionalUrlExtension }"/>
                             <a id="breadcrumbLnk#{status.index}" href="#{widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? widgetWrapper.wrapURL(dsUrl) : dsUrl}" target="#{!widgetWrapper.widgetView or widgetWrapper.isWidgetTarget(breadcrumb.dvObject) ? '' : '_blank'}">
-                                <h:outputText value="#{s.replace(breadcrumb.breadcrumbText, ' Dataverse', '')}"/>
+                                <h:outputText value="#{breadcrumb.breadcrumbText}"/>
                             </a>
                         </ui:fragment>
                     </ui:fragment>
