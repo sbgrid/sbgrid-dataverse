@@ -7,11 +7,13 @@ import edu.harvard.iq.dataverse.DatasetServiceBean;
 import edu.harvard.iq.dataverse.DatasetVersion;
 import edu.harvard.iq.dataverse.EjbDataverseEngine;
 import edu.harvard.iq.dataverse.FileMetadata;
+import edu.harvard.iq.dataverse.PermissionServiceBean;
 import edu.harvard.iq.dataverse.authorization.AuthenticationServiceBean;
 import edu.harvard.iq.dataverse.authorization.users.AuthenticatedUser;
 import edu.harvard.iq.dataverse.engine.command.Command;
 import edu.harvard.iq.dataverse.engine.command.DataverseRequest;
 import edu.harvard.iq.dataverse.engine.command.exception.CommandException;
+import edu.harvard.iq.dataverse.engine.command.impl.UpdateDatasetCommand;
 import edu.harvard.iq.dataverse.engine.command.impl.UpdateDatasetVersionCommand;
 
 import javax.batch.api.BatchProperty;
@@ -68,6 +70,9 @@ public class FileRecordWriter extends AbstractItemWriter {
     @EJB
     DataFileServiceBean dataFileServiceBean;
 
+    @EJB
+    PermissionServiceBean permissionServiceBean;
+
     Dataset dataset;
     AuthenticatedUser user;
     private String persistentUserData = "";
@@ -78,6 +83,27 @@ public class FileRecordWriter extends AbstractItemWriter {
         Properties jobParams = jobOperator.getParameters(jobContext.getInstanceId());
         dataset = datasetServiceBean.findByGlobalId(jobParams.getProperty("datasetId"));
         user = authenticationServiceBean.getAuthenticatedUser(jobParams.getProperty("userId"));
+
+        // check constraints
+        if (dataset.getVersions().size() > 1 || 
+                dataset.getLatestVersion().getVersionState() != DatasetVersion.VersionState.DRAFT) {
+            String constraintError = "ConstraintException updating DatasetVersion form batch job: dataset must be a "
+                    + "single version in draft mode.";
+            logger.log(Level.SEVERE, constraintError);
+            persistentUserData += constraintError + " ";
+            stepContext.setPersistentUserData(persistentUserData);
+            stepContext.setExitStatus("FAILED");
+        }
+
+        // check permissions       
+        boolean canIssueCommand = permissionServiceBean
+                .requestOn(new DataverseRequest(user, (HttpServletRequest) null), dataset)
+                .canIssue(UpdateDatasetCommand.class);
+        if (!canIssueCommand) {
+            persistentUserData += "ERROR: user doesn't have permission to update the dataset. ";
+            stepContext.setPersistentUserData(persistentUserData);
+            stepContext.setExitStatus("FAILED");
+        }
     }
 
     @Override
@@ -135,7 +161,7 @@ public class FileRecordWriter extends AbstractItemWriter {
      * @return datafile
      */
     private DataFile createDataFile(File file) {
-
+        
         DatasetVersion version = dataset.getLatestVersion();
         String path = file.getAbsolutePath();
         String gid = dataset.getAuthority() + dataset.getDoiSeparator() + dataset.getIdentifier();
@@ -179,7 +205,6 @@ public class FileRecordWriter extends AbstractItemWriter {
         fmd.setDatasetVersion(version);
 
         datafile = dataFileServiceBean.save(datafile);
-
         return datafile;
     }
 
