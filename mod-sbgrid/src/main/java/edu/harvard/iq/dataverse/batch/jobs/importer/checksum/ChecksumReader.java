@@ -35,6 +35,8 @@ public class ChecksumReader extends AbstractItemReader {
 
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
+    public static final long MAX_RECORDS_FOR_DETAILED_ERROR_REPORTING = 2000;
+    
     @Inject
     JobContext jobContext;
 
@@ -112,6 +114,9 @@ public class ChecksumReader extends AbstractItemReader {
             iterator = records.iterator();
             currentRecordNumber = 0;
             totalRecordNumber = (long) records.size();
+        } else {
+            persistentUserData += "FAILED: the checksum manifest could not be found.";
+            stepContext.setExitStatus("FAILED");
         }
 
         // report missing checksums or datafile via persistentUserData
@@ -168,28 +173,38 @@ public class ChecksumReader extends AbstractItemReader {
             logger.log(Level.SEVERE, "There are " + Integer.toString(dataFiles) + " data files and " +
                     Long.toString(totalRecordNumber) + " checksums.");
 
-            // missing checksums
-            for (DataFile datafile : dataFileList) {
-                boolean found = false;
-                for (ChecksumRecord record : records) {
-                    if (datafile.getStorageIdentifier().equals(record.getPath())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) { missingChecksums.add(datafile.getStorageIdentifier()); }
-            }
-
-            // missing data files
-            for (ChecksumRecord record : records) {
-                boolean found = false;
+            persistentUserData += "FAILED: There are " + Integer.toString(dataFiles) + " data files and " +
+                    Long.toString(totalRecordNumber) + " checksums.";
+            
+            // don't bother for huge datasets
+            if (totalRecordNumber < MAX_RECORDS_FOR_DETAILED_ERROR_REPORTING) {
+                // missing checksums
                 for (DataFile datafile : dataFileList) {
-                    if (datafile.getStorageIdentifier().equals(record.getPath())) {
-                        found = true;
-                        break;
+                    boolean found = false;
+                    for (ChecksumRecord record : records) {
+                        if (datafile.getStorageIdentifier().equals(record.getPath())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        missingChecksums.add(datafile.getStorageIdentifier());
                     }
                 }
-                if (!found) { missingDataFiles.add(record.getPath()); }
+
+                // missing data files
+                for (ChecksumRecord record : records) {
+                    boolean found = false;
+                    for (DataFile datafile : dataFileList) {
+                        if (datafile.getStorageIdentifier().equals(record.getPath())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        missingDataFiles.add(record.getPath());
+                    }
+                }
             }
             return false;
         }
