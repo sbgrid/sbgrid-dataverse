@@ -10,6 +10,7 @@ import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
 import javax.ejb.EJB;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
@@ -28,6 +29,9 @@ public class ChecksumProcessor implements ItemProcessor {
     @Inject
     JobContext jobContext;
 
+    @Inject
+    StepContext stepContext;
+
     @EJB
     DatasetServiceBean datasetServiceBean;
 
@@ -37,7 +41,9 @@ public class ChecksumProcessor implements ItemProcessor {
     Dataset dataset;
 
     List<DataFile> dataFileList;
-    
+
+    private String persistentUserData = "";
+
     @PostConstruct
     public void init() {
         JobOperator jobOperator = BatchRuntime.getJobOperator();

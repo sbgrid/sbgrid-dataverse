@@ -15,6 +15,8 @@ import edu.harvard.iq.dataverse.batch.entities.JobExecutionEntity;
 import edu.harvard.iq.dataverse.batch.jobs.importer.ImportMode;
 import edu.harvard.iq.dataverse.batch.util.LoggingUtil;
 
+import javax.batch.api.BatchProperty;
+import javax.batch.api.chunk.listener.ItemReadListener;
 import javax.batch.api.listener.JobListener;
 import javax.batch.api.listener.StepListener;
 import javax.batch.operations.JobOperator;
@@ -28,21 +30,26 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
+import java.io.FileReader;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @Dependent
-public class FileRecordJobListener implements StepListener, JobListener {
+public class FileRecordJobListener implements ItemReadListener, StepListener, JobListener {
 
     private static final Logger logger = Logger.getLogger(FileRecordJobListener.class.getName());
 
     private static final UserNotification.Type notifyType = UserNotification.Type.FILESYSTEMIMPORT;
+
+    public static final String SEP = System.getProperty("file.separator");
 
     @Inject
     private JobContext jobContext = null;
@@ -64,7 +71,15 @@ public class FileRecordJobListener implements StepListener, JobListener {
     
     @EJB
     DataFileServiceBean dataFileServiceBean;
-    
+
+    @Inject
+    @BatchProperty
+    String checksumManifest;
+
+    @Inject
+    @BatchProperty
+    String checksumType;
+
     @Override
     public void afterStep() throws Exception {
         // no-op
@@ -75,6 +90,23 @@ public class FileRecordJobListener implements StepListener, JobListener {
         // no-op
     }
 
+    // item read listener
+    @Override
+    public void beforeRead() throws Exception {
+        // no-op
+    }
+
+    @Override
+    public void afterRead(Object item) throws Exception {
+        // no-op
+    }
+    
+    @Override
+    public void onReadError(Exception ex) throws Exception {
+        logger.log(Level.SEVERE, "FileRecordReadListener: onReadError: " +
+                stepContext.getTransientUserData() + "; Exception: " + ex);
+    }
+    
     Properties jobParams;
     Dataset dataset;
     String mode;
@@ -82,15 +114,14 @@ public class FileRecordJobListener implements StepListener, JobListener {
 
     @Override
     public void beforeJob() throws Exception {
-
+        
         // update job properties to be used elsewhere to determine dataset, user and mode
         JobOperator jobOperator = BatchRuntime.getJobOperator();
         jobParams = jobOperator.getParameters(jobContext.getInstanceId());
         jobParams.setProperty("datasetGlobalId", getDatasetGlobalId());
         jobParams.setProperty("userId", getUserId());
         jobParams.setProperty("mode", getMode());
-
-
+        
         // add a dataset lock
         String info = "Starting batch file import job.";
         if (user.getId() != null) {
@@ -98,6 +129,29 @@ public class FileRecordJobListener implements StepListener, JobListener {
         } else {
             datasetServiceBean.addDatasetLock(dataset.getId(), null, info);
         }
+
+        // check system property first, otherwise use default property in FileSystemImportJob.xml
+        String manifest;
+        if (System.getProperty("checksumManifest") != null) {
+            manifest = System.getProperty("checksumManifest");
+        } else {
+            manifest = checksumManifest;
+        }
+        // construct full path
+        String manifestAbsolutePath = System.getProperty("dataverse.files.directory")
+                + SEP + dataset.getAuthority()
+                + SEP + dataset.getIdentifier()
+                + SEP + manifest;
+
+        Scanner scanner = new Scanner(new FileReader(manifestAbsolutePath));
+        HashMap<String, String> map = new HashMap<>();
+        while (scanner.hasNextLine()) {
+            String[] parts = scanner.nextLine().split("\\s+");
+            if (parts.length == 2) {
+                map.put(parts[1].replaceAll("^\\./",""), parts[0]);
+            }
+        }
+        jobContext.setTransientUserData(map);
 
         // if mode = UPDATE or REPLACE, remove all filemetadata from the dataset version and start fresh
 

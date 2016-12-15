@@ -59,12 +59,19 @@ public class FileRecordProcessor implements ItemProcessor {
         
         // if mode = MERGE, this will skip any datafiles already referenced by filemetadata
         // if mode = UPDATE or REPLACE, the filemetadata list will already be empty at this point
-        for (FileMetadata fmd : dataset.getLatestVersion().getFileMetadatas()) {
-            if (fmd.getDataFile().getStorageIdentifier().equalsIgnoreCase(relativePath)) {
-                logger.log(Level.FINE, "Skipping: " + relativePath + " since it is already in the file metadata list.");
-                return null;
+        try {
+            for (FileMetadata fmd : dataset.getLatestVersion().getFileMetadatas()) {
+                if (fmd.getDataFile().getStorageIdentifier().equalsIgnoreCase(relativePath)) {
+                    //logger.log(Level.SEVERE, "Skipping: " + relativePath + " since it is already in the file metadata list.");
+                    //logger.log(Level.INFO, "OLD ITEM: " + path);
+                    return null;
+                }
             }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "ERROR: FileRecordProcessor - " + e.getMessage());
+            return null;
         }
+        //logger.log(Level.INFO, "NEW ITEM: " + path);
         return new File(path);
     }
 

@@ -18,6 +18,11 @@ public class ChecksumRecord {
         this.value = value;
     }
 
+    public void ChecksumRecord(String path, String value) {
+        this.path = path;
+        this.value = value;
+    }
+
     public String getType() {
         return type;
     }

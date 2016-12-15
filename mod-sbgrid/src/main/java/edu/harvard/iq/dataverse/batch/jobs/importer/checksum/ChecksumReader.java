@@ -4,8 +4,6 @@ import edu.harvard.iq.dataverse.DataFile;
 import edu.harvard.iq.dataverse.DataFileServiceBean;
 import edu.harvard.iq.dataverse.Dataset;
 import edu.harvard.iq.dataverse.DatasetServiceBean;
-import org.beanio.BeanReader;
-import org.beanio.StreamFactory;
 
 import javax.annotation.PostConstruct;
 import javax.batch.api.BatchProperty;
@@ -18,10 +16,10 @@ import javax.ejb.EJB;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -34,8 +32,6 @@ public class ChecksumReader extends AbstractItemReader {
     private static final Logger logger = Logger.getLogger(ChecksumReader.class.getName());
 
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-
-    public static final long MAX_RECORDS_FOR_DETAILED_ERROR_REPORTING = 2000;
     
     @Inject
     JobContext jobContext;
@@ -57,28 +53,19 @@ public class ChecksumReader extends AbstractItemReader {
     @EJB
     DataFileServiceBean fileService;
 
-    private boolean preflight = true;
     private String persistentUserData = "";
 
-    File directory;
     File manifest;
     
-    ArrayList<ChecksumRecord> records = new ArrayList<>();
-
-    Iterator<ChecksumRecord> iterator;
-
     long currentRecordNumber = 0;
-
-    long totalRecordNumber = 0;
-
+    
     List<DataFile> dataFileList;
-
-    List<String> missingDataFiles = new ArrayList<>();
-    List<String> missingChecksums = new ArrayList<>();
 
     Dataset dataset;
 
     String jobChecksumManifest;
+    
+    BufferedReader reader;
     
     @PostConstruct
     public void init() {
@@ -96,51 +83,31 @@ public class ChecksumReader extends AbstractItemReader {
 
     @Override
     public void open(Serializable checkpoint) throws Exception {
-
-        directory = new File(System.getProperty("dataverse.files.directory")
-                + File.separator + dataset.getAuthority() + File.separator + dataset.getIdentifier());
-
-        if (preflight()) {
-            StreamFactory factory = StreamFactory.newInstance();
-            factory.loadResource("mapping.xml");
-            BeanReader in = factory.createReader("checksumRecord", manifest);
-            ChecksumRecord record;
-            while ((record = (ChecksumRecord) in.read()) != null) {
-                record.setType(checksumType); // set algorithm, in anticipation of multi-algorithm support in dataverse
-                record.setPath(record.getPath().replaceAll("^\\./", "")); // clean up path
-                records.add(record);
-            }
-            in.close();
-            iterator = records.iterator();
-            currentRecordNumber = 0;
-            totalRecordNumber = (long) records.size();
-        } else {
-            persistentUserData += "FAILED: the checksum manifest could not be found.";
-            stepContext.setExitStatus("FAILED");
-        }
-
-        // report missing checksums or datafile via persistentUserData
-        boolean checksumsComplete = checksumManifestComplete();
-        if (!checksumsComplete) {
-            logger.log(Level.SEVERE, "Checksum and Datafile totals don't match.");
-            stepContext.setExitStatus("FAILED");
-            if (missingChecksums.size() > 0) {
-                logger.log(Level.SEVERE, "FAILED: missing checksums " + missingChecksums.toString());
-                persistentUserData += "FAILED: missing checksums " + missingChecksums.toString() + " ";
-            }
-            if (missingDataFiles.size() > 0) {
-                logger.log(Level.SEVERE, "FAILED: missing data files " + missingDataFiles.toString());
-                persistentUserData += "FAILED: missing data files " + missingDataFiles.toString() + " ";
-            }
-        }
+        manifest = new File(System.getProperty("dataverse.files.directory")
+                + FILE_SEPARATOR + dataset.getAuthority() 
+                + FILE_SEPARATOR + dataset.getIdentifier() 
+                + FILE_SEPARATOR + jobChecksumManifest);
+        reader = new BufferedReader(new FileReader(manifest));
     }
 
     @Override
     public ChecksumRecord readItem() {
-        if (iterator != null && iterator.hasNext()) {
-            currentRecordNumber++;
-            return iterator.next();
-        } else {
+        currentRecordNumber++;
+        try {
+            String[] parts = reader.readLine().split("\\s+");
+            if (parts.length == 2 && parts[0].length() > 0 && parts[1].length() > 0) {
+                String path = parts[1];
+                String value = parts[0];
+                ChecksumRecord checksumRecord = new ChecksumRecord();
+                checksumRecord.setPath(path.replaceAll("^\\./", ""));
+                checksumRecord.setValue(value);
+                return checksumRecord;
+            } else {
+                logger.log(Level.SEVERE, "ERROR: empty path and/or value parsing checksum record.");
+                return null;
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "ERROR: reading checksum record: " + e.getMessage());
             return null;
         }
     }
@@ -151,63 +118,4 @@ public class ChecksumReader extends AbstractItemReader {
             stepContext.setPersistentUserData(persistentUserData);
         }
     }
-
-    public boolean preflight() {
-        String preflightMessage;
-        // make sure the checksum manifest exists
-        manifest = new File(this.directory.getAbsolutePath() + FILE_SEPARATOR + jobChecksumManifest);
-        if (!manifest.exists()) {
-            this.preflight = false;
-            preflightMessage = "The checksum manifest cannot be found: " + manifest.getAbsolutePath();
-            logger.log(Level.SEVERE, preflightMessage);
-        }
-        return preflight;
-    }
-
-    private boolean checksumManifestComplete() {
-
-        int dataFiles = dataFileList.size();
-        if (totalRecordNumber == dataFiles) {
-            return true;
-        } else {
-            logger.log(Level.SEVERE, "There are " + Integer.toString(dataFiles) + " data files and " +
-                    Long.toString(totalRecordNumber) + " checksums.");
-
-            persistentUserData += "FAILED: There are " + Integer.toString(dataFiles) + " data files and " +
-                    Long.toString(totalRecordNumber) + " checksums.";
-            
-            // don't bother for huge datasets
-            if (totalRecordNumber < MAX_RECORDS_FOR_DETAILED_ERROR_REPORTING) {
-                // missing checksums
-                for (DataFile datafile : dataFileList) {
-                    boolean found = false;
-                    for (ChecksumRecord record : records) {
-                        if (datafile.getStorageIdentifier().equals(record.getPath())) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        missingChecksums.add(datafile.getStorageIdentifier());
-                    }
-                }
-
-                // missing data files
-                for (ChecksumRecord record : records) {
-                    boolean found = false;
-                    for (DataFile datafile : dataFileList) {
-                        if (datafile.getStorageIdentifier().equals(record.getPath())) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        missingDataFiles.add(record.getPath());
-                    }
-                }
-            }
-            return false;
-        }
-    }
-
 }

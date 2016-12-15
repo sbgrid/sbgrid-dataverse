@@ -16,6 +16,7 @@ import edu.harvard.iq.dataverse.engine.command.exception.CommandException;
 import edu.harvard.iq.dataverse.engine.command.impl.UpdateDatasetCommand;
 import edu.harvard.iq.dataverse.engine.command.impl.UpdateDatasetVersionCommand;
 
+import javax.annotation.PostConstruct;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.operations.JobOperator;
@@ -28,14 +29,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 
 @Named
@@ -43,6 +51,8 @@ import java.util.logging.Logger;
 public class FileRecordWriter extends AbstractItemWriter {
 
     private static final Logger logger = Logger.getLogger(FileRecordWriter.class.getName());
+
+    public static final String SEP = System.getProperty("file.separator");
 
     @Inject
     JobContext jobContext;
@@ -76,34 +86,59 @@ public class FileRecordWriter extends AbstractItemWriter {
     Dataset dataset;
     AuthenticatedUser user;
     private String persistentUserData = "";
+    String manifestAbsolutePath;
 
-    @Override
-    public void open(Serializable checkpoint) throws Exception {
+    Supplier<Stream<String>> streamSupplier;
+
+    @PostConstruct
+    public void init() {
         JobOperator jobOperator = BatchRuntime.getJobOperator();
         Properties jobParams = jobOperator.getParameters(jobContext.getInstanceId());
         dataset = datasetServiceBean.findByGlobalId(jobParams.getProperty("datasetId"));
         user = authenticationServiceBean.getAuthenticatedUser(jobParams.getProperty("userId"));
-
-        // check constraints
-        if (dataset.getVersions().size() > 1 || 
-                dataset.getLatestVersion().getVersionState() != DatasetVersion.VersionState.DRAFT) {
-            String constraintError = "ConstraintException updating DatasetVersion form batch job: dataset must be a "
-                    + "single version in draft mode.";
-            logger.log(Level.SEVERE, constraintError);
-            persistentUserData += constraintError + " ";
-            stepContext.setPersistentUserData(persistentUserData);
-            stepContext.setExitStatus("FAILED");
+        // check system property first, otherwise use default property in FileSystemImportJob.xml
+        String manifest;
+        if (System.getProperty("checksumManifest") != null) {
+            manifest = System.getProperty("checksumManifest");
+        } else {
+            manifest = checksumManifest;
         }
-
-        // check permissions   
-        boolean canIssueCommand = permissionServiceBean
-                .requestOn(new DataverseRequest(user, (HttpServletRequest) null), dataset)
-                .canIssue(UpdateDatasetCommand.class);
-        if (!canIssueCommand) {
-            persistentUserData += "ERROR: user doesn't have permission to update the dataset. ";
-            stepContext.setPersistentUserData(persistentUserData);
-            stepContext.setExitStatus("FAILED");
+        // construct full path
+        manifestAbsolutePath = System.getProperty("dataverse.files.directory")
+                + SEP + dataset.getAuthority()
+                + SEP + dataset.getIdentifier()
+                + SEP + manifest;
+        try {
+            Stream<String> checksumLines = Files.lines(Paths.get(manifestAbsolutePath));
+            streamSupplier = () -> checksumLines;
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, "ERROR: " + ioe.getMessage());
         }
+    }
+    
+    @Override
+    public void open(Serializable checkpoint) throws Exception {
+        
+//        // check constraints
+//        if (dataset.getVersions().size() > 1 || 
+//                dataset.getLatestVersion().getVersionState() != DatasetVersion.VersionState.DRAFT) {
+//            String constraintError = "ConstraintException updating DatasetVersion form batch job: dataset must be a "
+//                    + "single version in draft mode.";
+//            logger.log(Level.SEVERE, constraintError);
+//            persistentUserData += constraintError + " ";
+//            stepContext.setPersistentUserData(persistentUserData);
+//            stepContext.setExitStatus("FAILED");
+//        }
+//
+//        // check permissions   
+//        boolean canIssueCommand = permissionServiceBean
+//                .requestOn(new DataverseRequest(user, (HttpServletRequest) null), dataset)
+//                .canIssue(UpdateDatasetCommand.class);
+//        if (!canIssueCommand) {
+//            persistentUserData += "ERROR: user doesn't have permission to update the dataset. ";
+//            stepContext.setPersistentUserData(persistentUserData);
+//            stepContext.setExitStatus("FAILED");
+//        }
     }
 
     @Override
@@ -113,15 +148,24 @@ public class FileRecordWriter extends AbstractItemWriter {
         if (!persistentUserData.isEmpty()) {
             stepContext.setPersistentUserData(persistentUserData);
         }
+        //checksumLines.close();
     }
 
     @Override
     public void writeItems(List list) {
-        List<DataFile> datafiles = dataset.getFiles();
-        for (Object file : list) {
-            datafiles.add(createDataFile((File) file));
+        try {
+            if (!list.isEmpty()) {
+                List<DataFile> datafiles = dataset.getFiles();
+                for (Object file : list) {
+                    datafiles.add(createDataFile((File) file));
+                }
+                dataset.getLatestVersion().getDataset().setFiles(datafiles);
+            } else {
+                logger.log(Level.SEVERE, "ERROR FileRecordWriter: empty list");
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "ERROR FileRecordWriter: " + e.getMessage());
         }
-        dataset.getLatestVersion().getDataset().setFiles(datafiles);
     }
 
     // utils
@@ -189,8 +233,14 @@ public class FileRecordWriter extends AbstractItemWriter {
                 break;
             }
         }
-        datafile.setChecksumValue("Unknown"); // only temporary since a checksum import job will run next
-
+        // lookup the checksum value in the job's manifest hashmap
+        String checksumVal = ((HashMap<String, String>)jobContext.getTransientUserData()).get(relativePath);
+        if (checksumVal != null) {
+            datafile.setChecksumValue(checksumVal);
+        } else {
+            datafile.setChecksumValue("Unknown");
+        }
+        
         // set metadata and add to latest version
         FileMetadata fmd = new FileMetadata();
         fmd.setLabel(file.getName());
@@ -204,7 +254,25 @@ public class FileRecordWriter extends AbstractItemWriter {
         version.getFileMetadatas().add(fmd);
         fmd.setDatasetVersion(version);
 
+        datafile = dataFileServiceBean.save(datafile);
         return datafile;
     }
+    
+    private String getChecksumValue(String path) {
+        try {
+            Optional<String> hasChecksum = streamSupplier.get()
+                    .filter(line -> line.contains(path))
+                    .findFirst();
+            if (hasChecksum.isPresent()) {
+                return hasChecksum.get().split("\\s+")[0];
+            } else {
+                return "Unknown";
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "ERROR: " + e.getMessage());
+            return "Unknown";
+        }
+    }
+    
 
 }
