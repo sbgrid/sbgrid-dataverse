@@ -5,9 +5,9 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
+SET standard_conforming_strings = ON;
+SET check_function_bodies = FALSE;
+SET client_min_messages = WARNING;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
@@ -15,29 +15,36 @@ SET client_min_messages = warning;
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+-- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_with_oids = FALSE;
 
 --
 -- Name: EJB__TIMER__TBL; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE "EJB__TIMER__TBL" (
-  "TIMERID" character varying(255) NOT NULL,
-  "APPLICATIONID" bigint,
-  "BLOB" bytea,
-  "CONTAINERID" bigint,
-  "CREATIONTIMERAW" bigint,
-  "INITIALEXPIRATIONRAW" bigint,
-  "INTERVALDURATION" bigint,
-  "LASTEXPIRATIONRAW" bigint,
-  "OWNERID" character varying(255),
-  "PKHASHCODE" integer,
-  "SCHEDULE" character varying(255),
-  "STATE" integer
+  "TIMERID"              CHARACTER VARYING(255) NOT NULL,
+  "APPLICATIONID"        BIGINT,
+  "BLOB"                 BYTEA,
+  "CONTAINERID"          BIGINT,
+  "CREATIONTIMERAW"      BIGINT,
+  "INITIALEXPIRATIONRAW" BIGINT,
+  "INTERVALDURATION"     BIGINT,
+  "LASTEXPIRATIONRAW"    BIGINT,
+  "OWNERID"              CHARACTER VARYING(255),
+  "PKHASHCODE"           INTEGER,
+  "SCHEDULE"             CHARACTER VARYING(255),
+  "STATE"                INTEGER
 );
 
 
@@ -48,14 +55,14 @@ ALTER TABLE public."EJB__TIMER__TBL" OWNER TO dvnapp;
 --
 
 CREATE TABLE actionlogrecord (
-  id character varying(36) NOT NULL,
-  actionresult character varying(255),
-  actionsubtype character varying(255),
-  actiontype character varying(255),
-  endtime timestamp without time zone,
-  info character varying(1024),
-  starttime timestamp without time zone,
-  useridentifier character varying(255)
+  id             CHARACTER VARYING(36) NOT NULL,
+  actionresult   CHARACTER VARYING(255),
+  actionsubtype  CHARACTER VARYING(255),
+  actiontype     CHARACTER VARYING(255),
+  endtime        TIMESTAMP WITHOUT TIME ZONE,
+  info           CHARACTER VARYING(1024),
+  starttime      TIMESTAMP WITHOUT TIME ZONE,
+  useridentifier CHARACTER VARYING(255)
 );
 
 
@@ -66,12 +73,12 @@ ALTER TABLE public.actionlogrecord OWNER TO dvnapp;
 --
 
 CREATE TABLE apitoken (
-  id integer NOT NULL,
-  createtime timestamp without time zone NOT NULL,
-  disabled boolean NOT NULL,
-  expiretime timestamp without time zone NOT NULL,
-  tokenstring character varying(255) NOT NULL,
-  authenticateduser_id bigint NOT NULL
+  id                   INTEGER                     NOT NULL,
+  createtime           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  disabled             BOOLEAN                     NOT NULL,
+  expiretime           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  tokenstring          CHARACTER VARYING(255)      NOT NULL,
+  authenticateduser_id BIGINT                      NOT NULL
 );
 
 
@@ -97,22 +104,21 @@ ALTER TABLE public.apitoken_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE apitoken_id_seq OWNED BY apitoken.id;
 
-
 --
 -- Name: authenticateduser; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE authenticateduser (
-  id integer NOT NULL,
-  affiliation character varying(255),
-  email character varying(255) NOT NULL,
-  firstname character varying(255),
-  lastname character varying(255),
-  modificationtime timestamp without time zone,
-  "position" character varying(255),
-  superuser boolean,
-  useridentifier character varying(255) NOT NULL,
-  emailconfirmed timestamp without time zone
+  id               INTEGER                NOT NULL,
+  affiliation      CHARACTER VARYING(255),
+  email            CHARACTER VARYING(255) NOT NULL,
+  firstname        CHARACTER VARYING(255),
+  lastname         CHARACTER VARYING(255),
+  modificationtime TIMESTAMP WITHOUT TIME ZONE,
+  "position"       CHARACTER VARYING(255),
+  superuser        BOOLEAN,
+  useridentifier   CHARACTER VARYING(255) NOT NULL,
+  emailconfirmed   TIMESTAMP WITHOUT TIME ZONE
 );
 
 
@@ -138,16 +144,15 @@ ALTER TABLE public.authenticateduser_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE authenticateduser_id_seq OWNED BY authenticateduser.id;
 
-
 --
 -- Name: authenticateduserlookup; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE authenticateduserlookup (
-  id integer NOT NULL,
-  authenticationproviderid character varying(255),
-  persistentuserid character varying(255),
-  authenticateduser_id bigint NOT NULL
+  id                       INTEGER NOT NULL,
+  authenticationproviderid CHARACTER VARYING(255),
+  persistentuserid         CHARACTER VARYING(255),
+  authenticateduser_id     BIGINT  NOT NULL
 );
 
 
@@ -173,18 +178,17 @@ ALTER TABLE public.authenticateduserlookup_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE authenticateduserlookup_id_seq OWNED BY authenticateduserlookup.id;
 
-
 --
 -- Name: authenticationproviderrow; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE authenticationproviderrow (
-  id character varying(255) NOT NULL,
-  enabled boolean,
-  factoryalias character varying(255),
-  factorydata text,
-  subtitle character varying(255),
-  title character varying(255)
+  id           CHARACTER VARYING(255) NOT NULL,
+  enabled      BOOLEAN,
+  factoryalias CHARACTER VARYING(255),
+  factorydata  TEXT,
+  subtitle     CHARACTER VARYING(255),
+  title        CHARACTER VARYING(255)
 );
 
 
@@ -195,15 +199,15 @@ ALTER TABLE public.authenticationproviderrow OWNER TO dvnapp;
 --
 
 CREATE TABLE builtinuser (
-  id integer NOT NULL,
-  affiliation character varying(255),
-  email character varying(255) NOT NULL,
-  encryptedpassword character varying(255),
-  firstname character varying(255),
-  lastname character varying(255),
-  passwordencryptionversion integer,
-  "position" character varying(255),
-  username character varying(255) NOT NULL
+  id                        INTEGER                NOT NULL,
+  affiliation               CHARACTER VARYING(255),
+  email                     CHARACTER VARYING(255) NOT NULL,
+  encryptedpassword         CHARACTER VARYING(255),
+  firstname                 CHARACTER VARYING(255),
+  lastname                  CHARACTER VARYING(255),
+  passwordencryptionversion INTEGER,
+  "position"                CHARACTER VARYING(255),
+  username                  CHARACTER VARYING(255) NOT NULL
 );
 
 
@@ -229,20 +233,19 @@ ALTER TABLE public.builtinuser_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE builtinuser_id_seq OWNED BY builtinuser.id;
 
-
 --
 -- Name: clientharvestrun; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE clientharvestrun (
-  id integer NOT NULL,
-  deleteddatasetcount bigint,
-  faileddatasetcount bigint,
-  finishtime timestamp without time zone,
-  harvestresult integer,
-  harvesteddatasetcount bigint,
-  starttime timestamp without time zone,
-  harvestingclient_id bigint NOT NULL
+  id                    INTEGER NOT NULL,
+  deleteddatasetcount   BIGINT,
+  faileddatasetcount    BIGINT,
+  finishtime            TIMESTAMP WITHOUT TIME ZONE,
+  harvestresult         INTEGER,
+  harvesteddatasetcount BIGINT,
+  starttime             TIMESTAMP WITHOUT TIME ZONE,
+  harvestingclient_id   BIGINT  NOT NULL
 );
 
 
@@ -268,17 +271,16 @@ ALTER TABLE public.clientharvestrun_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE clientharvestrun_id_seq OWNED BY clientharvestrun.id;
 
-
 --
 -- Name: confirmemaildata; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE confirmemaildata (
-  id integer NOT NULL,
-  created timestamp without time zone NOT NULL,
-  expires timestamp without time zone NOT NULL,
-  token character varying(255),
-  authenticateduser_id bigint NOT NULL
+  id                   INTEGER                     NOT NULL,
+  created              TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  expires              TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  token                CHARACTER VARYING(255),
+  authenticateduser_id BIGINT                      NOT NULL
 );
 
 
@@ -304,16 +306,15 @@ ALTER TABLE public.confirmemaildata_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE confirmemaildata_id_seq OWNED BY confirmemaildata.id;
 
-
 --
 -- Name: controlledvocabalternate; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE controlledvocabalternate (
-  id integer NOT NULL,
-  strvalue text,
-  controlledvocabularyvalue_id bigint NOT NULL,
-  datasetfieldtype_id bigint NOT NULL
+  id                           INTEGER NOT NULL,
+  strvalue                     TEXT,
+  controlledvocabularyvalue_id BIGINT  NOT NULL,
+  datasetfieldtype_id          BIGINT  NOT NULL
 );
 
 
@@ -339,17 +340,16 @@ ALTER TABLE public.controlledvocabalternate_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE controlledvocabalternate_id_seq OWNED BY controlledvocabalternate.id;
 
-
 --
 -- Name: controlledvocabularyvalue; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE controlledvocabularyvalue (
-  id integer NOT NULL,
-  displayorder integer,
-  identifier character varying(255),
-  strvalue text,
-  datasetfieldtype_id bigint
+  id                  INTEGER NOT NULL,
+  displayorder        INTEGER,
+  identifier          CHARACTER VARYING(255),
+  strvalue            TEXT,
+  datasetfieldtype_id BIGINT
 );
 
 
@@ -375,16 +375,15 @@ ALTER TABLE public.controlledvocabularyvalue_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE controlledvocabularyvalue_id_seq OWNED BY controlledvocabularyvalue.id;
 
-
 --
 -- Name: customfieldmap; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE customfieldmap (
-  id integer NOT NULL,
-  sourcedatasetfield character varying(255),
-  sourcetemplate character varying(255),
-  targetdatasetfield character varying(255)
+  id                 INTEGER NOT NULL,
+  sourcedatasetfield CHARACTER VARYING(255),
+  sourcetemplate     CHARACTER VARYING(255),
+  targetdatasetfield CHARACTER VARYING(255)
 );
 
 
@@ -410,19 +409,18 @@ ALTER TABLE public.customfieldmap_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE customfieldmap_id_seq OWNED BY customfieldmap.id;
 
-
 --
 -- Name: customquestion; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE customquestion (
-  id integer NOT NULL,
-  displayorder integer,
-  hidden boolean,
-  questionstring character varying(255) NOT NULL,
-  questiontype character varying(255) NOT NULL,
-  required boolean,
-  guestbook_id bigint NOT NULL
+  id             INTEGER                NOT NULL,
+  displayorder   INTEGER,
+  hidden         BOOLEAN,
+  questionstring CHARACTER VARYING(255) NOT NULL,
+  questiontype   CHARACTER VARYING(255) NOT NULL,
+  required       BOOLEAN,
+  guestbook_id   BIGINT                 NOT NULL
 );
 
 
@@ -448,16 +446,15 @@ ALTER TABLE public.customquestion_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE customquestion_id_seq OWNED BY customquestion.id;
 
-
 --
 -- Name: customquestionresponse; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE customquestionresponse (
-  id integer NOT NULL,
-  response text,
-  customquestion_id bigint NOT NULL,
-  guestbookresponse_id bigint NOT NULL
+  id                   INTEGER NOT NULL,
+  response             TEXT,
+  customquestion_id    BIGINT  NOT NULL,
+  guestbookresponse_id BIGINT  NOT NULL
 );
 
 
@@ -483,16 +480,15 @@ ALTER TABLE public.customquestionresponse_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE customquestionresponse_id_seq OWNED BY customquestionresponse.id;
 
-
 --
 -- Name: customquestionvalue; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE customquestionvalue (
-  id integer NOT NULL,
-  displayorder integer,
-  valuestring character varying(255) NOT NULL,
-  customquestion_id bigint NOT NULL
+  id                INTEGER                NOT NULL,
+  displayorder      INTEGER,
+  valuestring       CHARACTER VARYING(255) NOT NULL,
+  customquestion_id BIGINT                 NOT NULL
 );
 
 
@@ -518,21 +514,20 @@ ALTER TABLE public.customquestionvalue_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE customquestionvalue_id_seq OWNED BY customquestionvalue.id;
 
-
 --
 -- Name: datafile; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datafile (
-  id bigint NOT NULL,
-  contenttype character varying(255) NOT NULL,
-  filesystemname character varying(255) NOT NULL,
-  filesize bigint,
-  ingeststatus character(1),
-  checksumvalue character varying(255) NOT NULL,
-  name character varying(255),
-  restricted boolean,
-  checksumtype character varying(255) NOT NULL
+  id             BIGINT                 NOT NULL,
+  contenttype    CHARACTER VARYING(255) NOT NULL,
+  filesystemname CHARACTER VARYING(255) NOT NULL,
+  filesize       BIGINT,
+  ingeststatus   CHARACTER(1),
+  checksumvalue  CHARACTER VARYING(255) NOT NULL,
+  name           CHARACTER VARYING(255),
+  restricted     BOOLEAN,
+  checksumtype   CHARACTER VARYING(255) NOT NULL
 );
 
 
@@ -543,9 +538,9 @@ ALTER TABLE public.datafile OWNER TO dvnapp;
 --
 
 CREATE TABLE datafilecategory (
-  id integer NOT NULL,
-  name character varying(255) NOT NULL,
-  dataset_id bigint NOT NULL
+  id         INTEGER                NOT NULL,
+  name       CHARACTER VARYING(255) NOT NULL,
+  dataset_id BIGINT                 NOT NULL
 );
 
 
@@ -571,15 +566,14 @@ ALTER TABLE public.datafilecategory_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datafilecategory_id_seq OWNED BY datafilecategory.id;
 
-
 --
 -- Name: datafiletag; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datafiletag (
-  id integer NOT NULL,
-  type integer NOT NULL,
-  datafile_id bigint NOT NULL
+  id          INTEGER NOT NULL,
+  type        INTEGER NOT NULL,
+  datafile_id BIGINT  NOT NULL
 );
 
 
@@ -605,27 +599,26 @@ ALTER TABLE public.datafiletag_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datafiletag_id_seq OWNED BY datafiletag.id;
 
-
 --
 -- Name: dataset; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataset (
-  id bigint NOT NULL,
-  authority character varying(255),
-  doiseparator character varying(255),
-  fileaccessrequest boolean,
-  globalidcreatetime timestamp without time zone,
-  identifier character varying(255) NOT NULL,
-  protocol character varying(255),
-  guestbook_id bigint,
-  thumbnailfile_id bigint,
-  citationdatedatasetfieldtype_id bigint,
-  lastexporttime timestamp without time zone,
-  harvestingclient_id bigint,
-  harvestidentifier character varying(255),
-  dcmtype text,
-  dcmvalue text
+  id                              BIGINT                 NOT NULL,
+  authority                       CHARACTER VARYING(255),
+  doiseparator                    CHARACTER VARYING(255),
+  fileaccessrequest               BOOLEAN,
+  globalidcreatetime              TIMESTAMP WITHOUT TIME ZONE,
+  identifier                      CHARACTER VARYING(255) NOT NULL,
+  protocol                        CHARACTER VARYING(255),
+  guestbook_id                    BIGINT,
+  thumbnailfile_id                BIGINT,
+  citationdatedatasetfieldtype_id BIGINT,
+  lastexporttime                  TIMESTAMP WITHOUT TIME ZONE,
+  harvestingclient_id             BIGINT,
+  harvestidentifier               CHARACTER VARYING(255),
+  dcmtype                         TEXT,
+  dcmvalue                        TEXT
 );
 
 
@@ -636,11 +629,11 @@ ALTER TABLE public.dataset OWNER TO dvnapp;
 --
 
 CREATE TABLE datasetfield (
-  id integer NOT NULL,
-  datasetfieldtype_id bigint NOT NULL,
-  datasetversion_id bigint,
-  parentdatasetfieldcompoundvalue_id bigint,
-  template_id bigint
+  id                                 INTEGER NOT NULL,
+  datasetfieldtype_id                BIGINT  NOT NULL,
+  datasetversion_id                  BIGINT,
+  parentdatasetfieldcompoundvalue_id BIGINT,
+  template_id                        BIGINT
 );
 
 
@@ -651,8 +644,8 @@ ALTER TABLE public.datasetfield OWNER TO dvnapp;
 --
 
 CREATE TABLE datasetfield_controlledvocabularyvalue (
-  datasetfield_id bigint NOT NULL,
-  controlledvocabularyvalues_id bigint NOT NULL
+  datasetfield_id               BIGINT NOT NULL,
+  controlledvocabularyvalues_id BIGINT NOT NULL
 );
 
 
@@ -678,15 +671,14 @@ ALTER TABLE public.datasetfield_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetfield_id_seq OWNED BY datasetfield.id;
 
-
 --
 -- Name: datasetfieldcompoundvalue; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetfieldcompoundvalue (
-  id integer NOT NULL,
-  displayorder integer,
-  parentdatasetfield_id bigint
+  id                    INTEGER NOT NULL,
+  displayorder          INTEGER,
+  parentdatasetfield_id BIGINT
 );
 
 
@@ -712,18 +704,17 @@ ALTER TABLE public.datasetfieldcompoundvalue_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetfieldcompoundvalue_id_seq OWNED BY datasetfieldcompoundvalue.id;
 
-
 --
 -- Name: datasetfielddefaultvalue; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetfielddefaultvalue (
-  id integer NOT NULL,
-  displayorder integer,
-  strvalue text,
-  datasetfield_id bigint NOT NULL,
-  defaultvalueset_id bigint NOT NULL,
-  parentdatasetfielddefaultvalue_id bigint
+  id                                INTEGER NOT NULL,
+  displayorder                      INTEGER,
+  strvalue                          TEXT,
+  datasetfield_id                   BIGINT  NOT NULL,
+  defaultvalueset_id                BIGINT  NOT NULL,
+  parentdatasetfielddefaultvalue_id BIGINT
 );
 
 
@@ -749,28 +740,27 @@ ALTER TABLE public.datasetfielddefaultvalue_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetfielddefaultvalue_id_seq OWNED BY datasetfielddefaultvalue.id;
 
-
 --
 -- Name: datasetfieldtype; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetfieldtype (
-  id integer NOT NULL,
-  advancedsearchfieldtype boolean,
-  allowcontrolledvocabulary boolean,
-  allowmultiples boolean,
-  description text,
-  displayformat character varying(255),
-  displayoncreate boolean,
-  displayorder integer,
-  facetable boolean,
-  fieldtype character varying(255) NOT NULL,
-  name text,
-  required boolean,
-  title text,
-  watermark character varying(255),
-  metadatablock_id bigint,
-  parentdatasetfieldtype_id bigint
+  id                        INTEGER                NOT NULL,
+  advancedsearchfieldtype   BOOLEAN,
+  allowcontrolledvocabulary BOOLEAN,
+  allowmultiples            BOOLEAN,
+  description               TEXT,
+  displayformat             CHARACTER VARYING(255),
+  displayoncreate           BOOLEAN,
+  displayorder              INTEGER,
+  facetable                 BOOLEAN,
+  fieldtype                 CHARACTER VARYING(255) NOT NULL,
+  name                      TEXT,
+  required                  BOOLEAN,
+  title                     TEXT,
+  watermark                 CHARACTER VARYING(255),
+  metadatablock_id          BIGINT,
+  parentdatasetfieldtype_id BIGINT
 );
 
 
@@ -796,16 +786,15 @@ ALTER TABLE public.datasetfieldtype_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetfieldtype_id_seq OWNED BY datasetfieldtype.id;
 
-
 --
 -- Name: datasetfieldvalue; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetfieldvalue (
-  id integer NOT NULL,
-  displayorder integer,
-  value text,
-  datasetfield_id bigint NOT NULL
+  id              INTEGER NOT NULL,
+  displayorder    INTEGER,
+  value           TEXT,
+  datasetfield_id BIGINT  NOT NULL
 );
 
 
@@ -831,16 +820,15 @@ ALTER TABLE public.datasetfieldvalue_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetfieldvalue_id_seq OWNED BY datasetfieldvalue.id;
 
-
 --
 -- Name: datasetlinkingdataverse; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetlinkingdataverse (
-  id integer NOT NULL,
-  linkcreatetime timestamp without time zone NOT NULL,
-  dataset_id bigint NOT NULL,
-  linkingdataverse_id bigint NOT NULL
+  id                  INTEGER                     NOT NULL,
+  linkcreatetime      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  dataset_id          BIGINT                      NOT NULL,
+  linkingdataverse_id BIGINT                      NOT NULL
 );
 
 
@@ -866,17 +854,16 @@ ALTER TABLE public.datasetlinkingdataverse_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetlinkingdataverse_id_seq OWNED BY datasetlinkingdataverse.id;
 
-
 --
 -- Name: datasetlock; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetlock (
-  id integer NOT NULL,
-  info character varying(255),
-  starttime timestamp without time zone,
-  user_id bigint NOT NULL,
-  dataset_id bigint NOT NULL
+  id         INTEGER NOT NULL,
+  info       CHARACTER VARYING(255),
+  starttime  TIMESTAMP WITHOUT TIME ZONE,
+  user_id    BIGINT  NOT NULL,
+  dataset_id BIGINT  NOT NULL
 );
 
 
@@ -902,28 +889,27 @@ ALTER TABLE public.datasetlock_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetlock_id_seq OWNED BY datasetlock.id;
 
-
 --
 -- Name: datasetversion; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetversion (
-  id integer NOT NULL,
-  unf character varying(255),
-  archivenote character varying(1000),
-  archivetime timestamp without time zone,
-  createtime timestamp without time zone NOT NULL,
-  deaccessionlink character varying(255),
-  inreview boolean,
-  lastupdatetime timestamp without time zone NOT NULL,
-  minorversionnumber bigint,
-  releasetime timestamp without time zone,
-  version bigint,
-  versionnote character varying(1000),
-  versionnumber bigint,
-  versionstate character varying(255),
-  dataset_id bigint,
-  termsofuseandaccess_id bigint
+  id                     INTEGER                     NOT NULL,
+  unf                    CHARACTER VARYING(255),
+  archivenote            CHARACTER VARYING(1000),
+  archivetime            TIMESTAMP WITHOUT TIME ZONE,
+  createtime             TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  deaccessionlink        CHARACTER VARYING(255),
+  inreview               BOOLEAN,
+  lastupdatetime         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  minorversionnumber     BIGINT,
+  releasetime            TIMESTAMP WITHOUT TIME ZONE,
+  version                BIGINT,
+  versionnote            CHARACTER VARYING(1000),
+  versionnumber          BIGINT,
+  versionstate           CHARACTER VARYING(255),
+  dataset_id             BIGINT,
+  termsofuseandaccess_id BIGINT
 );
 
 
@@ -949,16 +935,15 @@ ALTER TABLE public.datasetversion_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetversion_id_seq OWNED BY datasetversion.id;
 
-
 --
 -- Name: datasetversionuser; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datasetversionuser (
-  id integer NOT NULL,
-  lastupdatedate timestamp without time zone NOT NULL,
-  authenticateduser_id bigint,
-  datasetversion_id bigint
+  id                   INTEGER                     NOT NULL,
+  lastupdatedate       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  authenticateduser_id BIGINT,
+  datasetversion_id    BIGINT
 );
 
 
@@ -984,20 +969,19 @@ ALTER TABLE public.datasetversionuser_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datasetversionuser_id_seq OWNED BY datasetversionuser.id;
 
-
 --
 -- Name: datatable; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datatable (
-  id integer NOT NULL,
-  casequantity bigint,
-  originalfileformat character varying(255),
-  originalformatversion character varying(255),
-  recordspercase bigint,
-  unf character varying(255) NOT NULL,
-  varquantity bigint,
-  datafile_id bigint NOT NULL
+  id                    INTEGER                NOT NULL,
+  casequantity          BIGINT,
+  originalfileformat    CHARACTER VARYING(255),
+  originalformatversion CHARACTER VARYING(255),
+  recordspercase        BIGINT,
+  unf                   CHARACTER VARYING(255) NOT NULL,
+  varquantity           BIGINT,
+  datafile_id           BIGINT                 NOT NULL
 );
 
 
@@ -1023,29 +1007,28 @@ ALTER TABLE public.datatable_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datatable_id_seq OWNED BY datatable.id;
 
-
 --
 -- Name: datavariable; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE datavariable (
-  id integer NOT NULL,
-  fileendposition bigint,
-  fileorder integer,
-  filestartposition bigint,
-  format character varying(255),
-  formatcategory character varying(255),
-  "interval" integer,
-  label text,
-  name character varying(255),
-  numberofdecimalpoints bigint,
-  orderedfactor boolean,
-  recordsegmentnumber bigint,
-  type integer,
-  unf character varying(255),
-  universe character varying(255),
-  weighted boolean,
-  datatable_id bigint NOT NULL
+  id                    INTEGER NOT NULL,
+  fileendposition       BIGINT,
+  fileorder             INTEGER,
+  filestartposition     BIGINT,
+  format                CHARACTER VARYING(255),
+  formatcategory        CHARACTER VARYING(255),
+  "interval"            INTEGER,
+  label                 TEXT,
+  name                  CHARACTER VARYING(255),
+  numberofdecimalpoints BIGINT,
+  orderedfactor         BOOLEAN,
+  recordsegmentnumber   BIGINT,
+  type                  INTEGER,
+  unf                   CHARACTER VARYING(255),
+  universe              CHARACTER VARYING(255),
+  weighted              BOOLEAN,
+  datatable_id          BIGINT  NOT NULL
 );
 
 
@@ -1071,28 +1054,27 @@ ALTER TABLE public.datavariable_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE datavariable_id_seq OWNED BY datavariable.id;
 
-
 --
 -- Name: dataverse; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataverse (
-  id bigint NOT NULL,
-  affiliation character varying(255),
-  alias character varying(255) NOT NULL,
-  dataversetype character varying(255) NOT NULL,
-  description text,
-  facetroot boolean,
-  guestbookroot boolean,
-  metadatablockroot boolean,
-  name character varying(255) NOT NULL,
-  permissionroot boolean,
-  templateroot boolean,
-  themeroot boolean,
-  defaultcontributorrole_id bigint NOT NULL,
-  defaulttemplate_id bigint,
-  citationredirecturl character varying(255),
-  fileuploadmechanisms character varying(255)
+  id                        BIGINT                 NOT NULL,
+  affiliation               CHARACTER VARYING(255),
+  alias                     CHARACTER VARYING(255) NOT NULL,
+  dataversetype             CHARACTER VARYING(255) NOT NULL,
+  description               TEXT,
+  facetroot                 BOOLEAN,
+  guestbookroot             BOOLEAN,
+  metadatablockroot         BOOLEAN,
+  name                      CHARACTER VARYING(255) NOT NULL,
+  permissionroot            BOOLEAN,
+  templateroot              BOOLEAN,
+  themeroot                 BOOLEAN,
+  defaultcontributorrole_id BIGINT                 NOT NULL,
+  defaulttemplate_id        BIGINT,
+  citationredirecturl       CHARACTER VARYING(255),
+  fileuploadmechanisms      CHARACTER VARYING(255)
 );
 
 
@@ -1103,8 +1085,8 @@ ALTER TABLE public.dataverse OWNER TO dvnapp;
 --
 
 CREATE TABLE dataverse_citationdatasetfieldtypes (
-  dataverse_id bigint NOT NULL,
-  citationdatasetfieldtype_id bigint NOT NULL
+  dataverse_id                BIGINT NOT NULL,
+  citationdatasetfieldtype_id BIGINT NOT NULL
 );
 
 
@@ -1115,8 +1097,8 @@ ALTER TABLE public.dataverse_citationdatasetfieldtypes OWNER TO dvnapp;
 --
 
 CREATE TABLE dataverse_metadatablock (
-  dataverse_id bigint NOT NULL,
-  metadatablocks_id bigint NOT NULL
+  dataverse_id      BIGINT NOT NULL,
+  metadatablocks_id BIGINT NOT NULL
 );
 
 
@@ -1127,10 +1109,10 @@ ALTER TABLE public.dataverse_metadatablock OWNER TO dvnapp;
 --
 
 CREATE TABLE dataversecontact (
-  id integer NOT NULL,
-  contactemail character varying(255) NOT NULL,
-  displayorder integer,
-  dataverse_id bigint
+  id           INTEGER                NOT NULL,
+  contactemail CHARACTER VARYING(255) NOT NULL,
+  displayorder INTEGER,
+  dataverse_id BIGINT
 );
 
 
@@ -1156,16 +1138,15 @@ ALTER TABLE public.dataversecontact_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataversecontact_id_seq OWNED BY dataversecontact.id;
 
-
 --
 -- Name: dataversefacet; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataversefacet (
-  id integer NOT NULL,
-  displayorder integer,
-  datasetfieldtype_id bigint,
-  dataverse_id bigint
+  id                  INTEGER NOT NULL,
+  displayorder        INTEGER,
+  datasetfieldtype_id BIGINT,
+  dataverse_id        BIGINT
 );
 
 
@@ -1191,16 +1172,15 @@ ALTER TABLE public.dataversefacet_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataversefacet_id_seq OWNED BY dataversefacet.id;
 
-
 --
 -- Name: dataversefeatureddataverse; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataversefeatureddataverse (
-  id integer NOT NULL,
-  displayorder integer,
-  dataverse_id bigint,
-  featureddataverse_id bigint
+  id                   INTEGER NOT NULL,
+  displayorder         INTEGER,
+  dataverse_id         BIGINT,
+  featureddataverse_id BIGINT
 );
 
 
@@ -1226,17 +1206,16 @@ ALTER TABLE public.dataversefeatureddataverse_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataversefeatureddataverse_id_seq OWNED BY dataversefeatureddataverse.id;
 
-
 --
 -- Name: dataversefieldtypeinputlevel; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataversefieldtypeinputlevel (
-  id integer NOT NULL,
-  include boolean,
-  required boolean,
-  datasetfieldtype_id bigint,
-  dataverse_id bigint
+  id                  INTEGER NOT NULL,
+  include             BOOLEAN,
+  required            BOOLEAN,
+  datasetfieldtype_id BIGINT,
+  dataverse_id        BIGINT
 );
 
 
@@ -1262,16 +1241,15 @@ ALTER TABLE public.dataversefieldtypeinputlevel_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataversefieldtypeinputlevel_id_seq OWNED BY dataversefieldtypeinputlevel.id;
 
-
 --
 -- Name: dataverselinkingdataverse; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataverselinkingdataverse (
-  id integer NOT NULL,
-  linkcreatetime timestamp without time zone,
-  dataverse_id bigint NOT NULL,
-  linkingdataverse_id bigint NOT NULL
+  id                  INTEGER NOT NULL,
+  linkcreatetime      TIMESTAMP WITHOUT TIME ZONE,
+  dataverse_id        BIGINT  NOT NULL,
+  linkingdataverse_id BIGINT  NOT NULL
 );
 
 
@@ -1297,18 +1275,17 @@ ALTER TABLE public.dataverselinkingdataverse_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataverselinkingdataverse_id_seq OWNED BY dataverselinkingdataverse.id;
 
-
 --
 -- Name: dataverserole; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataverserole (
-  id integer NOT NULL,
-  alias character varying(255) NOT NULL,
-  description character varying(255),
-  name character varying(255) NOT NULL,
-  permissionbits bigint,
-  owner_id bigint
+  id             INTEGER                NOT NULL,
+  alias          CHARACTER VARYING(255) NOT NULL,
+  description    CHARACTER VARYING(255),
+  name           CHARACTER VARYING(255) NOT NULL,
+  permissionbits BIGINT,
+  owner_id       BIGINT
 );
 
 
@@ -1334,14 +1311,13 @@ ALTER TABLE public.dataverserole_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataverserole_id_seq OWNED BY dataverserole.id;
 
-
 --
 -- Name: dataversesubjects; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dataversesubjects (
-  dataverse_id bigint NOT NULL,
-  controlledvocabularyvalue_id bigint NOT NULL
+  dataverse_id                 BIGINT NOT NULL,
+  controlledvocabularyvalue_id BIGINT NOT NULL
 );
 
 
@@ -1352,17 +1328,17 @@ ALTER TABLE public.dataversesubjects OWNER TO dvnapp;
 --
 
 CREATE TABLE dataversetheme (
-  id integer NOT NULL,
-  backgroundcolor character varying(255),
-  linkcolor character varying(255),
-  linkurl character varying(255),
-  logo character varying(255),
-  logoalignment character varying(255),
-  logobackgroundcolor character varying(255),
-  logoformat character varying(255),
-  tagline character varying(255),
-  textcolor character varying(255),
-  dataverse_id bigint
+  id                  INTEGER NOT NULL,
+  backgroundcolor     CHARACTER VARYING(255),
+  linkcolor           CHARACTER VARYING(255),
+  linkurl             CHARACTER VARYING(255),
+  logo                CHARACTER VARYING(255),
+  logoalignment       CHARACTER VARYING(255),
+  logobackgroundcolor CHARACTER VARYING(255),
+  logoformat          CHARACTER VARYING(255),
+  tagline             CHARACTER VARYING(255),
+  textcolor           CHARACTER VARYING(255),
+  dataverse_id        BIGINT
 );
 
 
@@ -1388,14 +1364,13 @@ ALTER TABLE public.dataversetheme_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dataversetheme_id_seq OWNED BY dataversetheme.id;
 
-
 --
 -- Name: defaultvalueset; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE defaultvalueset (
-  id integer NOT NULL,
-  name character varying(255) NOT NULL
+  id   INTEGER                NOT NULL,
+  name CHARACTER VARYING(255) NOT NULL
 );
 
 
@@ -1421,17 +1396,16 @@ ALTER TABLE public.defaultvalueset_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE defaultvalueset_id_seq OWNED BY defaultvalueset.id;
 
-
 --
 -- Name: doidataciteregistercache; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE doidataciteregistercache (
-  id integer NOT NULL,
-  doi character varying(255),
-  status character varying(255),
-  url character varying(255),
-  xml text
+  id     INTEGER NOT NULL,
+  doi    CHARACTER VARYING(255),
+  status CHARACTER VARYING(255),
+  url    CHARACTER VARYING(255),
+  xml    TEXT
 );
 
 
@@ -1457,24 +1431,23 @@ ALTER TABLE public.doidataciteregistercache_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE doidataciteregistercache_id_seq OWNED BY doidataciteregistercache.id;
 
-
 --
 -- Name: dvobject; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE dvobject (
-  id integer NOT NULL,
-  dtype character varying(31),
-  createdate timestamp without time zone NOT NULL,
-  indextime timestamp without time zone,
-  modificationtime timestamp without time zone NOT NULL,
-  permissionindextime timestamp without time zone,
-  permissionmodificationtime timestamp without time zone,
-  previewimageavailable boolean,
-  publicationdate timestamp without time zone,
-  creator_id bigint,
-  owner_id bigint,
-  releaseuser_id bigint
+  id                         INTEGER                     NOT NULL,
+  dtype                      CHARACTER VARYING(31),
+  createdate                 TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  indextime                  TIMESTAMP WITHOUT TIME ZONE,
+  modificationtime           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  permissionindextime        TIMESTAMP WITHOUT TIME ZONE,
+  permissionmodificationtime TIMESTAMP WITHOUT TIME ZONE,
+  previewimageavailable      BOOLEAN,
+  publicationdate            TIMESTAMP WITHOUT TIME ZONE,
+  creator_id                 BIGINT,
+  owner_id                   BIGINT,
+  releaseuser_id             BIGINT
 );
 
 
@@ -1500,18 +1473,17 @@ ALTER TABLE public.dvobject_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE dvobject_id_seq OWNED BY dvobject.id;
 
-
 --
 -- Name: explicitgroup; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE explicitgroup (
-  id integer NOT NULL,
-  description character varying(1024),
-  displayname character varying(255),
-  groupalias character varying(255),
-  groupaliasinowner character varying(255),
-  owner_id bigint
+  id                INTEGER NOT NULL,
+  description       CHARACTER VARYING(1024),
+  displayname       CHARACTER VARYING(255),
+  groupalias        CHARACTER VARYING(255),
+  groupaliasinowner CHARACTER VARYING(255),
+  owner_id          BIGINT
 );
 
 
@@ -1522,8 +1494,8 @@ ALTER TABLE public.explicitgroup OWNER TO dvnapp;
 --
 
 CREATE TABLE explicitgroup_authenticateduser (
-  explicitgroup_id bigint NOT NULL,
-  containedauthenticatedusers_id bigint NOT NULL
+  explicitgroup_id               BIGINT NOT NULL,
+  containedauthenticatedusers_id BIGINT NOT NULL
 );
 
 
@@ -1534,8 +1506,8 @@ ALTER TABLE public.explicitgroup_authenticateduser OWNER TO dvnapp;
 --
 
 CREATE TABLE explicitgroup_containedroleassignees (
-  explicitgroup_id bigint,
-  containedroleassignees character varying(255)
+  explicitgroup_id       BIGINT,
+  containedroleassignees CHARACTER VARYING(255)
 );
 
 
@@ -1546,8 +1518,8 @@ ALTER TABLE public.explicitgroup_containedroleassignees OWNER TO dvnapp;
 --
 
 CREATE TABLE explicitgroup_explicitgroup (
-  explicitgroup_id bigint NOT NULL,
-  containedexplicitgroups_id bigint NOT NULL
+  explicitgroup_id           BIGINT NOT NULL,
+  containedexplicitgroups_id BIGINT NOT NULL
 );
 
 
@@ -1573,14 +1545,13 @@ ALTER TABLE public.explicitgroup_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE explicitgroup_id_seq OWNED BY explicitgroup.id;
 
-
 --
 -- Name: fileaccessrequests; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE fileaccessrequests (
-  datafile_id bigint NOT NULL,
-  authenticated_user_id bigint NOT NULL
+  datafile_id           BIGINT NOT NULL,
+  authenticated_user_id BIGINT NOT NULL
 );
 
 
@@ -1591,14 +1562,14 @@ ALTER TABLE public.fileaccessrequests OWNER TO dvnapp;
 --
 
 CREATE TABLE filemetadata (
-  id integer NOT NULL,
-  description text,
-  label character varying(255) NOT NULL,
-  restricted boolean,
-  version bigint,
-  datafile_id bigint NOT NULL,
-  datasetversion_id bigint NOT NULL,
-  directorylabel character varying(255)
+  id                INTEGER                NOT NULL,
+  description       TEXT,
+  label             CHARACTER VARYING(255) NOT NULL,
+  restricted        BOOLEAN,
+  version           BIGINT,
+  datafile_id       BIGINT                 NOT NULL,
+  datasetversion_id BIGINT                 NOT NULL,
+  directorylabel    CHARACTER VARYING(255)
 );
 
 
@@ -1609,8 +1580,8 @@ ALTER TABLE public.filemetadata OWNER TO dvnapp;
 --
 
 CREATE TABLE filemetadata_datafilecategory (
-  filecategories_id bigint NOT NULL,
-  filemetadatas_id bigint NOT NULL
+  filecategories_id BIGINT NOT NULL,
+  filemetadatas_id  BIGINT NOT NULL
 );
 
 
@@ -1636,18 +1607,17 @@ ALTER TABLE public.filemetadata_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE filemetadata_id_seq OWNED BY filemetadata.id;
 
-
 --
 -- Name: foreignmetadatafieldmapping; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE foreignmetadatafieldmapping (
-  id integer NOT NULL,
-  datasetfieldname text,
-  foreignfieldxpath text,
-  isattribute boolean,
-  foreignmetadataformatmapping_id bigint,
-  parentfieldmapping_id bigint
+  id                              INTEGER NOT NULL,
+  datasetfieldname                TEXT,
+  foreignfieldxpath               TEXT,
+  isattribute                     BOOLEAN,
+  foreignmetadataformatmapping_id BIGINT,
+  parentfieldmapping_id           BIGINT
 );
 
 
@@ -1673,17 +1643,16 @@ ALTER TABLE public.foreignmetadatafieldmapping_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE foreignmetadatafieldmapping_id_seq OWNED BY foreignmetadatafieldmapping.id;
 
-
 --
 -- Name: foreignmetadataformatmapping; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE foreignmetadataformatmapping (
-  id integer NOT NULL,
-  displayname character varying(255) NOT NULL,
-  name character varying(255) NOT NULL,
-  schemalocation character varying(255),
-  startelement character varying(255)
+  id             INTEGER                NOT NULL,
+  displayname    CHARACTER VARYING(255) NOT NULL,
+  name           CHARACTER VARYING(255) NOT NULL,
+  schemalocation CHARACTER VARYING(255),
+  startelement   CHARACTER VARYING(255)
 );
 
 
@@ -1709,21 +1678,20 @@ ALTER TABLE public.foreignmetadataformatmapping_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE foreignmetadataformatmapping_id_seq OWNED BY foreignmetadataformatmapping.id;
 
-
 --
 -- Name: guestbook; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE guestbook (
-  id integer NOT NULL,
-  createtime timestamp without time zone NOT NULL,
-  emailrequired boolean,
-  enabled boolean,
-  institutionrequired boolean,
-  name character varying(255),
-  namerequired boolean,
-  positionrequired boolean,
-  dataverse_id bigint
+  id                  INTEGER                     NOT NULL,
+  createtime          TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  emailrequired       BOOLEAN,
+  enabled             BOOLEAN,
+  institutionrequired BOOLEAN,
+  name                CHARACTER VARYING(255),
+  namerequired        BOOLEAN,
+  positionrequired    BOOLEAN,
+  dataverse_id        BIGINT
 );
 
 
@@ -1749,25 +1717,24 @@ ALTER TABLE public.guestbook_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE guestbook_id_seq OWNED BY guestbook.id;
 
-
 --
 -- Name: guestbookresponse; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE guestbookresponse (
-  id integer NOT NULL,
-  downloadtype character varying(255),
-  email character varying(255),
-  institution character varying(255),
-  name character varying(255),
-  "position" character varying(255),
-  responsetime timestamp without time zone,
-  sessionid character varying(255),
-  authenticateduser_id bigint,
-  datafile_id bigint NOT NULL,
-  dataset_id bigint NOT NULL,
-  datasetversion_id bigint,
-  guestbook_id bigint NOT NULL
+  id                   INTEGER NOT NULL,
+  downloadtype         CHARACTER VARYING(255),
+  email                CHARACTER VARYING(255),
+  institution          CHARACTER VARYING(255),
+  name                 CHARACTER VARYING(255),
+  "position"           CHARACTER VARYING(255),
+  responsetime         TIMESTAMP WITHOUT TIME ZONE,
+  sessionid            CHARACTER VARYING(255),
+  authenticateduser_id BIGINT,
+  datafile_id          BIGINT  NOT NULL,
+  dataset_id           BIGINT  NOT NULL,
+  datasetversion_id    BIGINT,
+  guestbook_id         BIGINT  NOT NULL
 );
 
 
@@ -1793,28 +1760,27 @@ ALTER TABLE public.guestbookresponse_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE guestbookresponse_id_seq OWNED BY guestbookresponse.id;
 
-
 --
 -- Name: harvestingclient; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE harvestingclient (
-  id integer NOT NULL,
-  archivedescription text,
-  archiveurl character varying(255),
-  deleted boolean,
-  harveststyle character varying(255),
-  harvesttype character varying(255),
-  harvestingnow boolean,
-  harvestingset character varying(255),
-  harvestingurl character varying(255),
-  metadataprefix character varying(255),
-  name character varying(255) NOT NULL,
-  scheduledayofweek integer,
-  schedulehourofday integer,
-  scheduleperiod character varying(255),
-  scheduled boolean,
-  dataverse_id bigint
+  id                 INTEGER                NOT NULL,
+  archivedescription TEXT,
+  archiveurl         CHARACTER VARYING(255),
+  deleted            BOOLEAN,
+  harveststyle       CHARACTER VARYING(255),
+  harvesttype        CHARACTER VARYING(255),
+  harvestingnow      BOOLEAN,
+  harvestingset      CHARACTER VARYING(255),
+  harvestingurl      CHARACTER VARYING(255),
+  metadataprefix     CHARACTER VARYING(255),
+  name               CHARACTER VARYING(255) NOT NULL,
+  scheduledayofweek  INTEGER,
+  schedulehourofday  INTEGER,
+  scheduleperiod     CHARACTER VARYING(255),
+  scheduled          BOOLEAN,
+  dataverse_id       BIGINT
 );
 
 
@@ -1840,20 +1806,19 @@ ALTER TABLE public.harvestingclient_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE harvestingclient_id_seq OWNED BY harvestingclient.id;
 
-
 --
 -- Name: harvestingdataverseconfig; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE harvestingdataverseconfig (
-  id bigint NOT NULL,
-  archivedescription text,
-  archiveurl character varying(255),
-  harveststyle character varying(255),
-  harvesttype character varying(255),
-  harvestingset character varying(255),
-  harvestingurl character varying(255),
-  dataverse_id bigint
+  id                 BIGINT NOT NULL,
+  archivedescription TEXT,
+  archiveurl         CHARACTER VARYING(255),
+  harveststyle       CHARACTER VARYING(255),
+  harvesttype        CHARACTER VARYING(255),
+  harvestingset      CHARACTER VARYING(255),
+  harvestingurl      CHARACTER VARYING(255),
+  dataverse_id       BIGINT
 );
 
 
@@ -1864,13 +1829,13 @@ ALTER TABLE public.harvestingdataverseconfig OWNER TO dvnapp;
 --
 
 CREATE TABLE ingestreport (
-  id integer NOT NULL,
-  endtime timestamp without time zone,
-  report character varying(255),
-  starttime timestamp without time zone,
-  status integer,
-  type integer,
-  datafile_id bigint NOT NULL
+  id          INTEGER NOT NULL,
+  endtime     TIMESTAMP WITHOUT TIME ZONE,
+  report      CHARACTER VARYING(255),
+  starttime   TIMESTAMP WITHOUT TIME ZONE,
+  status      INTEGER,
+  type        INTEGER,
+  datafile_id BIGINT  NOT NULL
 );
 
 
@@ -1896,17 +1861,16 @@ ALTER TABLE public.ingestreport_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE ingestreport_id_seq OWNED BY ingestreport.id;
 
-
 --
 -- Name: ingestrequest; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE ingestrequest (
-  id integer NOT NULL,
-  controlcard character varying(255),
-  labelsfile character varying(255),
-  textencoding character varying(255),
-  datafile_id bigint
+  id           INTEGER NOT NULL,
+  controlcard  CHARACTER VARYING(255),
+  labelsfile   CHARACTER VARYING(255),
+  textencoding CHARACTER VARYING(255),
+  datafile_id  BIGINT
 );
 
 
@@ -1932,16 +1896,15 @@ ALTER TABLE public.ingestrequest_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE ingestrequest_id_seq OWNED BY ingestrequest.id;
 
-
 --
 -- Name: ipv4range; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE ipv4range (
-  id bigint NOT NULL,
-  bottomaslong bigint,
-  topaslong bigint,
-  owner_id bigint
+  id           BIGINT NOT NULL,
+  bottomaslong BIGINT,
+  topaslong    BIGINT,
+  owner_id     BIGINT
 );
 
 
@@ -1952,16 +1915,16 @@ ALTER TABLE public.ipv4range OWNER TO dvnapp;
 --
 
 CREATE TABLE ipv6range (
-  id bigint NOT NULL,
-  bottoma bigint,
-  bottomb bigint,
-  bottomc bigint,
-  bottomd bigint,
-  topa bigint,
-  topb bigint,
-  topc bigint,
-  topd bigint,
-  owner_id bigint
+  id       BIGINT NOT NULL,
+  bottoma  BIGINT,
+  bottomb  BIGINT,
+  bottomc  BIGINT,
+  bottomd  BIGINT,
+  topa     BIGINT,
+  topb     BIGINT,
+  topc     BIGINT,
+  topd     BIGINT,
+  owner_id BIGINT
 );
 
 
@@ -1972,17 +1935,17 @@ ALTER TABLE public.ipv6range OWNER TO dvnapp;
 --
 
 CREATE TABLE maplayermetadata (
-  id integer NOT NULL,
-  embedmaplink character varying(255) NOT NULL,
-  layerlink character varying(255) NOT NULL,
-  layername character varying(255) NOT NULL,
-  mapimagelink character varying(255),
-  worldmapusername character varying(255) NOT NULL,
-  dataset_id bigint NOT NULL,
-  datafile_id bigint NOT NULL,
-  isjoinlayer boolean DEFAULT false,
-  joindescription text,
-  maplayerlinks text
+  id               INTEGER                NOT NULL,
+  embedmaplink     CHARACTER VARYING(255) NOT NULL,
+  layerlink        CHARACTER VARYING(255) NOT NULL,
+  layername        CHARACTER VARYING(255) NOT NULL,
+  mapimagelink     CHARACTER VARYING(255),
+  worldmapusername CHARACTER VARYING(255) NOT NULL,
+  dataset_id       BIGINT                 NOT NULL,
+  datafile_id      BIGINT                 NOT NULL,
+  isjoinlayer      BOOLEAN DEFAULT FALSE,
+  joindescription  TEXT,
+  maplayerlinks    TEXT
 );
 
 
@@ -2008,16 +1971,15 @@ ALTER TABLE public.maplayermetadata_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE maplayermetadata_id_seq OWNED BY maplayermetadata.id;
 
-
 --
 -- Name: metadatablock; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE metadatablock (
-  id integer NOT NULL,
-  displayname character varying(255) NOT NULL,
-  name character varying(255) NOT NULL,
-  owner_id bigint
+  id          INTEGER                NOT NULL,
+  displayname CHARACTER VARYING(255) NOT NULL,
+  name        CHARACTER VARYING(255) NOT NULL,
+  owner_id    BIGINT
 );
 
 
@@ -2043,17 +2005,16 @@ ALTER TABLE public.metadatablock_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE metadatablock_id_seq OWNED BY metadatablock.id;
 
-
 --
 -- Name: oairecord; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE oairecord (
-  id integer NOT NULL,
-  globalid character varying(255),
-  lastupdatetime timestamp without time zone,
-  removed boolean,
-  setname character varying(255)
+  id             INTEGER NOT NULL,
+  globalid       CHARACTER VARYING(255),
+  lastupdatetime TIMESTAMP WITHOUT TIME ZONE,
+  removed        BOOLEAN,
+  setname        CHARACTER VARYING(255)
 );
 
 
@@ -2079,20 +2040,19 @@ ALTER TABLE public.oairecord_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE oairecord_id_seq OWNED BY oairecord.id;
 
-
 --
 -- Name: oaiset; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE oaiset (
-  id integer NOT NULL,
-  definition text,
-  deleted boolean,
-  description text,
-  name text,
-  spec text,
-  updateinprogress boolean,
-  version bigint
+  id               INTEGER NOT NULL,
+  definition       TEXT,
+  deleted          BOOLEAN,
+  description      TEXT,
+  name             TEXT,
+  spec             TEXT,
+  updateinprogress BOOLEAN,
+  version          BIGINT
 );
 
 
@@ -2118,18 +2078,17 @@ ALTER TABLE public.oaiset_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE oaiset_id_seq OWNED BY oaiset.id;
 
-
 --
 -- Name: passwordresetdata; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE passwordresetdata (
-  id integer NOT NULL,
-  created timestamp without time zone NOT NULL,
-  expires timestamp without time zone NOT NULL,
-  reason character varying(255),
-  token character varying(255),
-  builtinuser_id bigint NOT NULL
+  id             INTEGER                     NOT NULL,
+  created        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  expires        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  reason         CHARACTER VARYING(255),
+  token          CHARACTER VARYING(255),
+  builtinuser_id BIGINT                      NOT NULL
 );
 
 
@@ -2155,17 +2114,16 @@ ALTER TABLE public.passwordresetdata_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE passwordresetdata_id_seq OWNED BY passwordresetdata.id;
 
-
 --
 -- Name: persistedglobalgroup; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE persistedglobalgroup (
-  id bigint NOT NULL,
-  dtype character varying(31),
-  description character varying(255),
-  displayname character varying(255),
-  persistedgroupalias character varying(255)
+  id                  BIGINT NOT NULL,
+  dtype               CHARACTER VARYING(31),
+  description         CHARACTER VARYING(255),
+  displayname         CHARACTER VARYING(255),
+  persistedgroupalias CHARACTER VARYING(255)
 );
 
 
@@ -2176,11 +2134,11 @@ ALTER TABLE public.persistedglobalgroup OWNER TO dvnapp;
 --
 
 CREATE TABLE roleassignment (
-  id integer NOT NULL,
-  assigneeidentifier character varying(255) NOT NULL,
-  definitionpoint_id bigint NOT NULL,
-  role_id bigint NOT NULL,
-  privateurltoken character varying(255)
+  id                 INTEGER                NOT NULL,
+  assigneeidentifier CHARACTER VARYING(255) NOT NULL,
+  definitionpoint_id BIGINT                 NOT NULL,
+  role_id            BIGINT                 NOT NULL,
+  privateurltoken    CHARACTER VARYING(255)
 );
 
 
@@ -2206,16 +2164,15 @@ ALTER TABLE public.roleassignment_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE roleassignment_id_seq OWNED BY roleassignment.id;
 
-
 --
 -- Name: savedsearch; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE savedsearch (
-  id integer NOT NULL,
-  query text,
-  creator_id bigint NOT NULL,
-  definitionpoint_id bigint NOT NULL
+  id                 INTEGER NOT NULL,
+  query              TEXT,
+  creator_id         BIGINT  NOT NULL,
+  definitionpoint_id BIGINT  NOT NULL
 );
 
 
@@ -2241,15 +2198,14 @@ ALTER TABLE public.savedsearch_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE savedsearch_id_seq OWNED BY savedsearch.id;
 
-
 --
 -- Name: savedsearchfilterquery; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE savedsearchfilterquery (
-  id integer NOT NULL,
-  filterquery text,
-  savedsearch_id bigint NOT NULL
+  id             INTEGER NOT NULL,
+  filterquery    TEXT,
+  savedsearch_id BIGINT  NOT NULL
 );
 
 
@@ -2275,14 +2231,13 @@ ALTER TABLE public.savedsearchfilterquery_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE savedsearchfilterquery_id_seq OWNED BY savedsearchfilterquery.id;
 
-
 --
 -- Name: sequence; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE sequence (
-  seq_name character varying(50) NOT NULL,
-  seq_count numeric(38,0)
+  seq_name  CHARACTER VARYING(50) NOT NULL,
+  seq_count NUMERIC(38, 0)
 );
 
 
@@ -2293,8 +2248,8 @@ ALTER TABLE public.sequence OWNER TO dvnapp;
 --
 
 CREATE TABLE setting (
-  name character varying(255) NOT NULL,
-  content text
+  name    CHARACTER VARYING(255) NOT NULL,
+  content TEXT
 );
 
 
@@ -2305,10 +2260,10 @@ ALTER TABLE public.setting OWNER TO dvnapp;
 --
 
 CREATE TABLE shibgroup (
-  id integer NOT NULL,
-  attribute character varying(255) NOT NULL,
-  name character varying(255) NOT NULL,
-  pattern character varying(255) NOT NULL
+  id        INTEGER                NOT NULL,
+  attribute CHARACTER VARYING(255) NOT NULL,
+  name      CHARACTER VARYING(255) NOT NULL,
+  pattern   CHARACTER VARYING(255) NOT NULL
 );
 
 
@@ -2334,16 +2289,15 @@ ALTER TABLE public.shibgroup_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE shibgroup_id_seq OWNED BY shibgroup.id;
 
-
 --
 -- Name: summarystatistic; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE summarystatistic (
-  id integer NOT NULL,
-  type integer,
-  value character varying(255),
-  datavariable_id bigint NOT NULL
+  id              INTEGER NOT NULL,
+  type            INTEGER,
+  value           CHARACTER VARYING(255),
+  datavariable_id BIGINT  NOT NULL
 );
 
 
@@ -2369,18 +2323,17 @@ ALTER TABLE public.summarystatistic_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE summarystatistic_id_seq OWNED BY summarystatistic.id;
 
-
 --
 -- Name: template; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE template (
-  id integer NOT NULL,
-  createtime timestamp without time zone NOT NULL,
-  name character varying(255) NOT NULL,
-  usagecount bigint,
-  dataverse_id bigint,
-  termsofuseandaccess_id bigint
+  id                     INTEGER                     NOT NULL,
+  createtime             TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  name                   CHARACTER VARYING(255)      NOT NULL,
+  usagecount             BIGINT,
+  dataverse_id           BIGINT,
+  termsofuseandaccess_id BIGINT
 );
 
 
@@ -2406,30 +2359,29 @@ ALTER TABLE public.template_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE template_id_seq OWNED BY template.id;
 
-
 --
 -- Name: termsofuseandaccess; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE termsofuseandaccess (
-  id integer NOT NULL,
-  availabilitystatus text,
-  citationrequirements text,
-  conditions text,
-  confidentialitydeclaration text,
-  contactforaccess text,
-  dataaccessplace text,
-  depositorrequirements text,
-  disclaimer text,
-  fileaccessrequest boolean,
-  license character varying(255),
-  originalarchive text,
-  restrictions text,
-  sizeofcollection text,
-  specialpermissions text,
-  studycompletion text,
-  termsofaccess text,
-  termsofuse text
+  id                         INTEGER NOT NULL,
+  availabilitystatus         TEXT,
+  citationrequirements       TEXT,
+  conditions                 TEXT,
+  confidentialitydeclaration TEXT,
+  contactforaccess           TEXT,
+  dataaccessplace            TEXT,
+  depositorrequirements      TEXT,
+  disclaimer                 TEXT,
+  fileaccessrequest          BOOLEAN,
+  license                    CHARACTER VARYING(255),
+  originalarchive            TEXT,
+  restrictions               TEXT,
+  sizeofcollection           TEXT,
+  specialpermissions         TEXT,
+  studycompletion            TEXT,
+  termsofaccess              TEXT,
+  termsofuse                 TEXT
 );
 
 
@@ -2455,19 +2407,18 @@ ALTER TABLE public.termsofuseandaccess_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE termsofuseandaccess_id_seq OWNED BY termsofuseandaccess.id;
 
-
 --
 -- Name: usernotification; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE usernotification (
-  id integer NOT NULL,
-  emailed boolean,
-  objectid bigint,
-  readnotification boolean,
-  senddate timestamp without time zone,
-  type integer NOT NULL,
-  user_id bigint NOT NULL
+  id               INTEGER NOT NULL,
+  emailed          BOOLEAN,
+  objectid         BIGINT,
+  readnotification BOOLEAN,
+  senddate         TIMESTAMP WITHOUT TIME ZONE,
+  type             INTEGER NOT NULL,
+  user_id          BIGINT  NOT NULL
 );
 
 
@@ -2493,19 +2444,18 @@ ALTER TABLE public.usernotification_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE usernotification_id_seq OWNED BY usernotification.id;
 
-
 --
 -- Name: variablecategory; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE variablecategory (
-  id integer NOT NULL,
-  catorder integer,
-  frequency double precision,
-  label character varying(255),
-  missing boolean,
-  value character varying(255),
-  datavariable_id bigint NOT NULL
+  id              INTEGER NOT NULL,
+  catorder        INTEGER,
+  frequency       DOUBLE PRECISION,
+  label           CHARACTER VARYING(255),
+  missing         BOOLEAN,
+  value           CHARACTER VARYING(255),
+  datavariable_id BIGINT  NOT NULL
 );
 
 
@@ -2531,18 +2481,17 @@ ALTER TABLE public.variablecategory_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE variablecategory_id_seq OWNED BY variablecategory.id;
 
-
 --
 -- Name: variablerange; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE variablerange (
-  id integer NOT NULL,
-  beginvalue character varying(255),
-  beginvaluetype integer,
-  endvalue character varying(255),
-  endvaluetype integer,
-  datavariable_id bigint NOT NULL
+  id              INTEGER NOT NULL,
+  beginvalue      CHARACTER VARYING(255),
+  beginvaluetype  INTEGER,
+  endvalue        CHARACTER VARYING(255),
+  endvaluetype    INTEGER,
+  datavariable_id BIGINT  NOT NULL
 );
 
 
@@ -2568,15 +2517,14 @@ ALTER TABLE public.variablerange_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE variablerange_id_seq OWNED BY variablerange.id;
 
-
 --
 -- Name: variablerangeitem; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE variablerangeitem (
-  id integer NOT NULL,
-  value numeric(38,0),
-  datavariable_id bigint NOT NULL
+  id              INTEGER NOT NULL,
+  value           NUMERIC(38, 0),
+  datavariable_id BIGINT  NOT NULL
 );
 
 
@@ -2602,21 +2550,20 @@ ALTER TABLE public.variablerangeitem_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE variablerangeitem_id_seq OWNED BY variablerangeitem.id;
 
-
 --
 -- Name: worldmapauth_token; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE worldmapauth_token (
-  id integer NOT NULL,
-  created timestamp without time zone NOT NULL,
-  hasexpired boolean NOT NULL,
-  lastrefreshtime timestamp without time zone NOT NULL,
-  modified timestamp without time zone NOT NULL,
-  token character varying(255),
-  application_id bigint NOT NULL,
-  datafile_id bigint NOT NULL,
-  dataverseuser_id bigint NOT NULL
+  id               INTEGER                     NOT NULL,
+  created          TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  hasexpired       BOOLEAN                     NOT NULL,
+  lastrefreshtime  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  modified         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  token            CHARACTER VARYING(255),
+  application_id   BIGINT                      NOT NULL,
+  datafile_id      BIGINT                      NOT NULL,
+  dataverseuser_id BIGINT                      NOT NULL
 );
 
 
@@ -2642,23 +2589,22 @@ ALTER TABLE public.worldmapauth_token_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE worldmapauth_token_id_seq OWNED BY worldmapauth_token.id;
 
-
 --
 -- Name: worldmapauth_tokentype; Type: TABLE; Schema: public; Owner: dvnapp; Tablespace: 
 --
 
 CREATE TABLE worldmapauth_tokentype (
-  id integer NOT NULL,
-  contactemail character varying(255),
-  created timestamp without time zone NOT NULL,
-  hostname character varying(255),
-  ipaddress character varying(255),
-  mapitlink character varying(255) NOT NULL,
-  md5 character varying(255) NOT NULL,
-  modified timestamp without time zone NOT NULL,
-  name character varying(255) NOT NULL,
-  timelimitminutes integer DEFAULT 30,
-  timelimitseconds bigint DEFAULT 1800
+  id               INTEGER                     NOT NULL,
+  contactemail     CHARACTER VARYING(255),
+  created          TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  hostname         CHARACTER VARYING(255),
+  ipaddress        CHARACTER VARYING(255),
+  mapitlink        CHARACTER VARYING(255)      NOT NULL,
+  md5              CHARACTER VARYING(255)      NOT NULL,
+  modified         TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  name             CHARACTER VARYING(255)      NOT NULL,
+  timelimitminutes INTEGER DEFAULT 30,
+  timelimitseconds BIGINT  DEFAULT 1800
 );
 
 
@@ -2684,499 +2630,417 @@ ALTER TABLE public.worldmapauth_tokentype_id_seq OWNER TO dvnapp;
 
 ALTER SEQUENCE worldmapauth_tokentype_id_seq OWNED BY worldmapauth_tokentype.id;
 
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY apitoken ALTER COLUMN id SET DEFAULT nextval('apitoken_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY apitoken ALTER COLUMN id SET DEFAULT nextval('apitoken_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY authenticateduser ALTER COLUMN id SET DEFAULT nextval('authenticateduser_id_seq'::regclass);
-
+ALTER TABLE ONLY authenticateduser ALTER COLUMN id SET DEFAULT nextval('authenticateduser_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY authenticateduserlookup ALTER COLUMN id SET DEFAULT nextval('authenticateduserlookup_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY builtinuser ALTER COLUMN id SET DEFAULT nextval('builtinuser_id_seq'::regclass);
-
+ALTER TABLE ONLY authenticateduserlookup ALTER COLUMN id SET DEFAULT nextval('authenticateduserlookup_id_seq
+                                                                             ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY clientharvestrun ALTER COLUMN id SET DEFAULT nextval('clientharvestrun_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY confirmemaildata ALTER COLUMN id SET DEFAULT nextval('confirmemaildata_id_seq'::regclass);
-
+ALTER TABLE ONLY builtinuser ALTER COLUMN id SET DEFAULT nextval('builtinuser_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY controlledvocabalternate ALTER COLUMN id SET DEFAULT nextval('controlledvocabalternate_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY controlledvocabularyvalue ALTER COLUMN id SET DEFAULT nextval('controlledvocabularyvalue_id_seq'::regclass);
-
+ALTER TABLE ONLY clientharvestrun ALTER COLUMN id SET DEFAULT nextval('clientharvestrun_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY customfieldmap ALTER COLUMN id SET DEFAULT nextval('customfieldmap_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY customquestion ALTER COLUMN id SET DEFAULT nextval('customquestion_id_seq'::regclass);
-
+ALTER TABLE ONLY confirmemaildata ALTER COLUMN id SET DEFAULT nextval('confirmemaildata_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY customquestionresponse ALTER COLUMN id SET DEFAULT nextval('customquestionresponse_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY customquestionvalue ALTER COLUMN id SET DEFAULT nextval('customquestionvalue_id_seq'::regclass);
-
+ALTER TABLE ONLY controlledvocabalternate ALTER COLUMN id SET DEFAULT nextval('controlledvocabalternate_id_seq
+                                                                              ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datafilecategory ALTER COLUMN id SET DEFAULT nextval('datafilecategory_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY datafiletag ALTER COLUMN id SET DEFAULT nextval('datafiletag_id_seq'::regclass);
-
+ALTER TABLE ONLY controlledvocabularyvalue ALTER COLUMN id SET DEFAULT nextval('controlledvocabularyvalue_id_seq
+                                                                               ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datasetfield ALTER COLUMN id SET DEFAULT nextval('datasetfield_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY datasetfieldcompoundvalue ALTER COLUMN id SET DEFAULT nextval('datasetfieldcompoundvalue_id_seq'::regclass);
-
+ALTER TABLE ONLY customfieldmap ALTER COLUMN id SET DEFAULT nextval('customfieldmap_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datasetfielddefaultvalue ALTER COLUMN id SET DEFAULT nextval('datasetfielddefaultvalue_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY datasetfieldtype ALTER COLUMN id SET DEFAULT nextval('datasetfieldtype_id_seq'::regclass);
-
+ALTER TABLE ONLY customquestion ALTER COLUMN id SET DEFAULT nextval('customquestion_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datasetfieldvalue ALTER COLUMN id SET DEFAULT nextval('datasetfieldvalue_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY datasetlinkingdataverse ALTER COLUMN id SET DEFAULT nextval('datasetlinkingdataverse_id_seq'::regclass);
-
+ALTER TABLE ONLY customquestionresponse ALTER COLUMN id SET DEFAULT nextval('customquestionresponse_id_seq
+                                                                            ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datasetlock ALTER COLUMN id SET DEFAULT nextval('datasetlock_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY datasetversion ALTER COLUMN id SET DEFAULT nextval('datasetversion_id_seq'::regclass);
-
+ALTER TABLE ONLY customquestionvalue ALTER COLUMN id SET DEFAULT nextval('customquestionvalue_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datasetversionuser ALTER COLUMN id SET DEFAULT nextval('datasetversionuser_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY datatable ALTER COLUMN id SET DEFAULT nextval('datatable_id_seq'::regclass);
-
+ALTER TABLE ONLY datafilecategory ALTER COLUMN id SET DEFAULT nextval('datafilecategory_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY datavariable ALTER COLUMN id SET DEFAULT nextval('datavariable_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY dataversecontact ALTER COLUMN id SET DEFAULT nextval('dataversecontact_id_seq'::regclass);
-
+ALTER TABLE ONLY datafiletag ALTER COLUMN id SET DEFAULT nextval('datafiletag_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY dataversefacet ALTER COLUMN id SET DEFAULT nextval('dataversefacet_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY dataversefeatureddataverse ALTER COLUMN id SET DEFAULT nextval('dataversefeatureddataverse_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetfield ALTER COLUMN id SET DEFAULT nextval('datasetfield_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY dataversefieldtypeinputlevel ALTER COLUMN id SET DEFAULT nextval('dataversefieldtypeinputlevel_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY dataverselinkingdataverse ALTER COLUMN id SET DEFAULT nextval('dataverselinkingdataverse_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetfieldcompoundvalue ALTER COLUMN id SET DEFAULT nextval('datasetfieldcompoundvalue_id_seq
+                                                                               ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY dataverserole ALTER COLUMN id SET DEFAULT nextval('dataverserole_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY dataversetheme ALTER COLUMN id SET DEFAULT nextval('dataversetheme_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetfielddefaultvalue ALTER COLUMN id SET DEFAULT nextval('datasetfielddefaultvalue_id_seq
+                                                                              ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY defaultvalueset ALTER COLUMN id SET DEFAULT nextval('defaultvalueset_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY dvobject ALTER COLUMN id SET DEFAULT nextval('dvobject_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetfieldtype ALTER COLUMN id SET DEFAULT nextval('datasetfieldtype_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY explicitgroup ALTER COLUMN id SET DEFAULT nextval('explicitgroup_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY filemetadata ALTER COLUMN id SET DEFAULT nextval('filemetadata_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetfieldvalue ALTER COLUMN id SET DEFAULT nextval('datasetfieldvalue_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY foreignmetadatafieldmapping ALTER COLUMN id SET DEFAULT nextval('foreignmetadatafieldmapping_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY foreignmetadataformatmapping ALTER COLUMN id SET DEFAULT nextval('foreignmetadataformatmapping_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetlinkingdataverse ALTER COLUMN id SET DEFAULT nextval('datasetlinkingdataverse_id_seq
+                                                                             ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY guestbook ALTER COLUMN id SET DEFAULT nextval('guestbook_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY guestbookresponse ALTER COLUMN id SET DEFAULT nextval('guestbookresponse_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetlock ALTER COLUMN id SET DEFAULT nextval('datasetlock_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY harvestingclient ALTER COLUMN id SET DEFAULT nextval('harvestingclient_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY ingestreport ALTER COLUMN id SET DEFAULT nextval('ingestreport_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetversion ALTER COLUMN id SET DEFAULT nextval('datasetversion_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY ingestrequest ALTER COLUMN id SET DEFAULT nextval('ingestrequest_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY maplayermetadata ALTER COLUMN id SET DEFAULT nextval('maplayermetadata_id_seq'::regclass);
-
+ALTER TABLE ONLY datasetversionuser ALTER COLUMN id SET DEFAULT nextval('datasetversionuser_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY metadatablock ALTER COLUMN id SET DEFAULT nextval('metadatablock_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY oairecord ALTER COLUMN id SET DEFAULT nextval('oairecord_id_seq'::regclass);
-
+ALTER TABLE ONLY datatable ALTER COLUMN id SET DEFAULT nextval('datatable_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY oaiset ALTER COLUMN id SET DEFAULT nextval('oaiset_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY passwordresetdata ALTER COLUMN id SET DEFAULT nextval('passwordresetdata_id_seq'::regclass);
-
+ALTER TABLE ONLY datavariable ALTER COLUMN id SET DEFAULT nextval('datavariable_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY roleassignment ALTER COLUMN id SET DEFAULT nextval('roleassignment_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY savedsearch ALTER COLUMN id SET DEFAULT nextval('savedsearch_id_seq'::regclass);
-
+ALTER TABLE ONLY dataversecontact ALTER COLUMN id SET DEFAULT nextval('dataversecontact_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY savedsearchfilterquery ALTER COLUMN id SET DEFAULT nextval('savedsearchfilterquery_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY shibgroup ALTER COLUMN id SET DEFAULT nextval('shibgroup_id_seq'::regclass);
-
+ALTER TABLE ONLY dataversefacet ALTER COLUMN id SET DEFAULT nextval('dataversefacet_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY summarystatistic ALTER COLUMN id SET DEFAULT nextval('summarystatistic_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY template ALTER COLUMN id SET DEFAULT nextval('template_id_seq'::regclass);
-
+ALTER TABLE ONLY dataversefeatureddataverse ALTER COLUMN id SET DEFAULT nextval('dataversefeatureddataverse_id_seq
+                                                                                ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY termsofuseandaccess ALTER COLUMN id SET DEFAULT nextval('termsofuseandaccess_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY usernotification ALTER COLUMN id SET DEFAULT nextval('usernotification_id_seq'::regclass);
-
+ALTER TABLE ONLY dataversefieldtypeinputlevel ALTER COLUMN id SET DEFAULT nextval('dataversefieldtypeinputlevel_id_seq
+                                                                                  ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY variablecategory ALTER COLUMN id SET DEFAULT nextval('variablecategory_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY variablerange ALTER COLUMN id SET DEFAULT nextval('variablerange_id_seq'::regclass);
-
+ALTER TABLE ONLY dataverselinkingdataverse ALTER COLUMN id SET DEFAULT nextval('dataverselinkingdataverse_id_seq
+                                                                               ' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY variablerangeitem ALTER COLUMN id SET DEFAULT nextval('variablerangeitem_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
---
-
-ALTER TABLE ONLY worldmapauth_token ALTER COLUMN id SET DEFAULT nextval('worldmapauth_token_id_seq'::regclass);
-
+ALTER TABLE ONLY dataverserole ALTER COLUMN id SET DEFAULT nextval('dataverserole_id_seq' :: REGCLASS);
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
 --
 
-ALTER TABLE ONLY worldmapauth_tokentype ALTER COLUMN id SET DEFAULT nextval('worldmapauth_tokentype_id_seq'::regclass);
+ALTER TABLE ONLY dataversetheme ALTER COLUMN id SET DEFAULT nextval('dataversetheme_id_seq' :: REGCLASS);
 
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY defaultvalueset ALTER COLUMN id SET DEFAULT nextval('defaultvalueset_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY dvobject ALTER COLUMN id SET DEFAULT nextval('dvobject_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY explicitgroup ALTER COLUMN id SET DEFAULT nextval('explicitgroup_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY filemetadata ALTER COLUMN id SET DEFAULT nextval('filemetadata_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY foreignmetadatafieldmapping ALTER COLUMN id SET DEFAULT nextval('foreignmetadatafieldmapping_id_seq
+                                                                                 ' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY foreignmetadataformatmapping ALTER COLUMN id SET DEFAULT nextval('foreignmetadataformatmapping_id_seq
+                                                                                  ' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY guestbook ALTER COLUMN id SET DEFAULT nextval('guestbook_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY guestbookresponse ALTER COLUMN id SET DEFAULT nextval('guestbookresponse_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY harvestingclient ALTER COLUMN id SET DEFAULT nextval('harvestingclient_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY ingestreport ALTER COLUMN id SET DEFAULT nextval('ingestreport_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY ingestrequest ALTER COLUMN id SET DEFAULT nextval('ingestrequest_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY maplayermetadata ALTER COLUMN id SET DEFAULT nextval('maplayermetadata_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY metadatablock ALTER COLUMN id SET DEFAULT nextval('metadatablock_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY oairecord ALTER COLUMN id SET DEFAULT nextval('oairecord_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY oaiset ALTER COLUMN id SET DEFAULT nextval('oaiset_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY passwordresetdata ALTER COLUMN id SET DEFAULT nextval('passwordresetdata_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY roleassignment ALTER COLUMN id SET DEFAULT nextval('roleassignment_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY savedsearch ALTER COLUMN id SET DEFAULT nextval('savedsearch_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY savedsearchfilterquery ALTER COLUMN id SET DEFAULT nextval('savedsearchfilterquery_id_seq
+                                                                            ' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY shibgroup ALTER COLUMN id SET DEFAULT nextval('shibgroup_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY summarystatistic ALTER COLUMN id SET DEFAULT nextval('summarystatistic_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY template ALTER COLUMN id SET DEFAULT nextval('template_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY termsofuseandaccess ALTER COLUMN id SET DEFAULT nextval('termsofuseandaccess_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY usernotification ALTER COLUMN id SET DEFAULT nextval('usernotification_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY variablecategory ALTER COLUMN id SET DEFAULT nextval('variablecategory_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY variablerange ALTER COLUMN id SET DEFAULT nextval('variablerange_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY variablerangeitem ALTER COLUMN id SET DEFAULT nextval('variablerangeitem_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY worldmapauth_token ALTER COLUMN id SET DEFAULT nextval('worldmapauth_token_id_seq' :: REGCLASS);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: dvnapp
+--
+
+ALTER TABLE ONLY worldmapauth_tokentype ALTER COLUMN id SET DEFAULT nextval('worldmapauth_tokentype_id_seq
+                                                                            ' :: REGCLASS);
 
 --
 -- Data for Name: EJB__TIMER__TBL; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
 
-
---
--- Data for Name: actionlogrecord; Type: TABLE DATA; Schema: public; Owner: dvnapp
---
-
-INSERT INTO actionlogrecord VALUES ('74d54e92-ef45-450a-8b4d-33c81ca01ad2', 'OK', 'registerProvider', 'Auth', '2016-09-27 19:37:22.734', 'builtin:Build-in Provider', '2016-09-27 19:37:22.732', NULL);
-INSERT INTO actionlogrecord VALUES ('9f6e09a1-dd33-4300-8ef2-8d1fe2266542', 'OK', 'registerProvider', 'Auth', '2016-09-27 19:37:22.744', 'echo-simple:Echo provider', '2016-09-27 19:37:22.744', NULL);
-INSERT INTO actionlogrecord VALUES ('6342eacf-2f37-4bce-bc00-022364242f73', 'OK', 'registerProvider', 'Auth', '2016-09-27 19:37:22.746', 'echo-dignified:Dignified Echo provider', '2016-09-27 19:37:22.746', NULL);
-INSERT INTO actionlogrecord VALUES ('3c08f2b5-f88a-4c50-a3b2-d9d1244d8a98', 'OK', 'updateUser', 'Auth', '2016-09-27 19:38:05.763', '@dataverseAdmin', '2016-09-27 19:38:05.763', NULL);
-INSERT INTO actionlogrecord VALUES ('e08fd1af-fba4-4036-a4c8-59cf045aebe4', 'OK', 'login', 'SessionManagement', '2016-09-27 19:38:05.778', NULL, '2016-09-27 19:38:05.778', '@dataverseAdmin');
-INSERT INTO actionlogrecord VALUES ('46da0b6e-2be7-4492-b033-7c754bb427a7', 'OK', 'registerProvider', 'Auth', '2016-10-25 09:24:19.772', 'builtin:Build-in Provider', '2016-10-25 09:24:19.769', NULL);
-INSERT INTO actionlogrecord VALUES ('80493882-1acc-433b-a41c-76c770a54310', 'OK', 'registerProvider', 'Auth', '2016-10-25 09:24:19.79', 'echo-simple:Echo provider', '2016-10-25 09:24:19.79', NULL);
-INSERT INTO actionlogrecord VALUES ('a9c4a67d-b4bd-42f2-adcf-4dcacfee8872', 'OK', 'registerProvider', 'Auth', '2016-10-25 09:24:19.798', 'echo-dignified:Dignified Echo provider', '2016-10-25 09:24:19.798', NULL);
-INSERT INTO actionlogrecord VALUES ('498858a2-5a02-4232-8333-1d9e8f10f955', 'OK', 'updateUser', 'Auth', '2016-10-25 09:25:06.95', '@dataverseAdmin', '2016-10-25 09:25:06.949', NULL);
-INSERT INTO actionlogrecord VALUES ('5b685c68-4919-463c-a4a0-fe87e5f7ae66', 'OK', 'login', 'SessionManagement', '2016-10-25 09:25:06.96', NULL, '2016-10-25 09:25:06.96', '@dataverseAdmin');
-INSERT INTO actionlogrecord VALUES ('3a2333eb-fdd8-47c7-9e08-1882ef49cb42', 'OK', 'registerProvider', 'Auth', '2016-10-25 09:37:55.576', 'builtin:Build-in Provider', '2016-10-25 09:37:55.573', NULL);
-INSERT INTO actionlogrecord VALUES ('43051e40-4392-4ea8-b564-c7274af0eedd', 'OK', 'registerProvider', 'Auth', '2016-10-25 09:37:55.59', 'echo-simple:Echo provider', '2016-10-25 09:37:55.59', NULL);
-INSERT INTO actionlogrecord VALUES ('24a6872d-4f70-4fa9-b7b7-9114de50ca23', 'OK', 'registerProvider', 'Auth', '2016-10-25 09:37:55.592', 'echo-dignified:Dignified Echo provider', '2016-10-25 09:37:55.592', NULL);
-INSERT INTO actionlogrecord VALUES ('aa7fa540-22bf-4e4e-8d4f-3f4d4cf5519b', 'OK', 'updateUser', 'Auth', '2016-10-25 09:38:08.899', '@dataverseAdmin', '2016-10-25 09:38:08.899', NULL);
-INSERT INTO actionlogrecord VALUES ('dc637410-37fa-414c-8c7c-f4723c6b444b', 'OK', 'login', 'SessionManagement', '2016-10-25 09:38:08.909', NULL, '2016-10-25 09:38:08.909', '@dataverseAdmin');
-INSERT INTO actionlogrecord VALUES ('731eab97-848c-4fdc-b405-bf38d45b3348', 'OK', 'loadDatasetFields', 'Admin', '2016-10-25 09:43:54.119', 'rep3418087237302679591tmp', '2016-10-25 09:43:53.992', NULL);
-INSERT INTO actionlogrecord VALUES ('30128a9f-b3c8-4b1f-b763-1806a881cf3d', 'OK', 'loadDatasetFields', 'Admin', '2016-10-25 09:44:26.123', 'rep6829011976025318207tmp', '2016-10-25 09:44:25.855', NULL);
-INSERT INTO actionlogrecord VALUES ('72fb584d-95ed-491d-9ecc-f019f71d16c1', 'OK', 'loadDatasetFields', 'Admin', '2016-10-25 09:44:54.157', 'rep7328282697357954051tmp', '2016-10-25 09:44:53.74', NULL);
-INSERT INTO actionlogrecord VALUES ('68d1b4de-c40c-4b2d-8e23-920055a79df8', 'OK', 'edu.harvard.iq.dataverse.engine.command.impl.UpdateDataverseMetadataBlocksCommand.SetRoot', 'Command', '2016-10-25 09:45:23.637', ':[1 Root] ', '2016-10-25 09:45:23.627', '@dataverseAdmin');
-INSERT INTO actionlogrecord VALUES ('d2fa1221-a4ab-4e3f-8f1f-6b1f5d63d33b', 'OK', 'edu.harvard.iq.dataverse.engine.command.impl.UpdateDataverseMetadataBlocksCommand.SetBlocks', 'Command', '2016-10-25 09:45:23.638', ':[1 Root] ', '2016-10-25 09:45:23.618', '@dataverseAdmin');
-INSERT INTO actionlogrecord VALUES ('f2788848-8bb8-4dde-94fe-d298ea497991', 'OK', 'registerProvider', 'Auth', '2016-11-17 18:26:11.767', 'builtin:Build-in Provider', '2016-11-17 18:26:11.764', NULL);
-INSERT INTO actionlogrecord VALUES ('33d9cd90-32a1-4fc1-ae76-d8517d79d55b', 'OK', 'registerProvider', 'Auth', '2016-11-17 18:26:11.787', 'echo-simple:Echo provider', '2016-11-17 18:26:11.787', NULL);
-INSERT INTO actionlogrecord VALUES ('a0eab252-df73-434b-94c7-2abf5306ba66', 'OK', 'registerProvider', 'Auth', '2016-11-17 18:26:11.795', 'echo-dignified:Dignified Echo provider', '2016-11-17 18:26:11.795', NULL);
-INSERT INTO actionlogrecord VALUES ('072927f1-a003-45cf-a01b-2a463f85c6b8', 'OK', 'updateUser', 'Auth', '2016-11-17 18:26:26.286', '@dataverseAdmin', '2016-11-17 18:26:26.285', NULL);
-INSERT INTO actionlogrecord VALUES ('6af8355b-a8fe-4447-8e11-481fe6590ae0', 'OK', 'login', 'SessionManagement', '2016-11-17 18:26:26.303', NULL, '2016-11-17 18:26:26.303', '@dataverseAdmin');
-INSERT INTO actionlogrecord VALUES ('d99617f7-6f05-4b98-963f-8b57709018c8', 'OK', 'edu.harvard.iq.dataverse.engine.command.impl.PublishDataverseCommand', 'Command', '2016-11-17 18:26:33.08', ':[1 Root] ', '2016-11-17 18:26:32.889', '@dataverseAdmin');
-
-
 --
 -- Data for Name: apitoken; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO apitoken VALUES (1, '2016-03-03 15:34:02.469', false, '2017-03-03 15:34:02.469', 'ea244329-a0cf-4a36-a530-f173e3762d3c', 1);
-
+INSERT INTO apitoken VALUES
+  (1, '2016-03-03 15:34:02.469', FALSE, '2017-03-03 15:34:02.469', 'ea244329-a0cf-4a36-a530-f173e3762d3c', 1);
 
 --
 -- Name: apitoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dvnapp
 --
 
-SELECT pg_catalog.setval('apitoken_id_seq', 2, true);
-
+SELECT pg_catalog.setval('apitoken_id_seq', 2, TRUE);
 
 --
 -- Data for Name: authenticateduser; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO authenticateduser VALUES (1, 'Dataverse.org', 'dataverse@mailinator.com', 'Dataverse', 'Admin', '2016-11-17 18:26:26.29', 'Admin', true, 'dataverseAdmin', NULL);
-
+INSERT INTO authenticateduser VALUES
+  (1, 'Dataverse.org', 'dataverse@mailinator.com', 'Dataverse', 'ADMIN', '2016-12-21 11:48:20.139', 'ADMIN',
+   TRUE, 'dataverseAdmin', NULL);
 
 --
 -- Name: authenticateduser_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dvnapp
 --
 
-SELECT pg_catalog.setval('authenticateduser_id_seq', 2, true);
-
+SELECT pg_catalog.setval('authenticateduser_id_seq', 2, TRUE);
 
 --
 -- Data for Name: authenticateduserlookup; Type: TABLE DATA; Schema: public; Owner: dvnapp
@@ -3184,28 +3048,30 @@ SELECT pg_catalog.setval('authenticateduser_id_seq', 2, true);
 
 INSERT INTO authenticateduserlookup VALUES (1, 'builtin', 'dataverseAdmin', 1);
 
-
 --
 -- Name: authenticateduserlookup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dvnapp
 --
 
-SELECT pg_catalog.setval('authenticateduserlookup_id_seq', 2, true);
-
+SELECT pg_catalog.setval('authenticateduserlookup_id_seq', 2, TRUE);
 
 --
 -- Data for Name: authenticationproviderrow; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO authenticationproviderrow VALUES ('builtin', true, 'BuiltinAuthenticationProvider', '', 'Datavers'' Internal Authentication provider', 'Dataverse Local');
-INSERT INTO authenticationproviderrow VALUES ('echo-simple', true, 'Echo', ',', 'Approves everyone, based on their credentials', 'Echo provider');
-INSERT INTO authenticationproviderrow VALUES ('echo-dignified', true, 'Echo', 'Sir,Esq.', 'Approves everyone, based on their credentials, and adds some flair', 'Dignified Echo provider');
-
+INSERT INTO authenticationproviderrow VALUES
+  ('builtin', TRUE, 'BuiltinAuthenticationProvider', '', 'Datavers'' INTERNAL Authentication provider',
+   'Dataverse LOCAL ');
+INSERT INTO authenticationproviderrow VALUES
+  ('echo- SIMPLE ', TRUE, 'Echo', ', ', 'Approves everyone, based ON their credentials', 'Echo provider');
+INSERT INTO authenticationproviderrow VALUES
+  ('echo-dignified', TRUE, 'Echo', 'Sir, Esq. ', 'Approves everyone, based ON their credentials, AND adds SOME
+   flair', 'Dignified Echo provider');
 
 --
 -- Data for Name: builtinuser; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO builtinuser VALUES (1, 'Dataverse.org', 'dataverse@mailinator.com', '$2a$10$Ad3ceYkNTHFhsIcz22uKJeyW9luZJnWQToJVWf0uclrG84SXnEl2W', 'Dataverse', 'Admin', 1, 'Admin', 'dataverseAdmin');
+INSERT INTO builtinuser VALUES (1, 'Dataverse.org', 'dataverse@mailinator.com', '$2a$10$kHzbKbTdU27HKPJbdMLDH.CawYaQlqtj8TXFJNG4yS9NJZfmqBNxa', 'Dataverse', 'Admin', 1, 'Admin', 'dataverseAdmin');
 
 
 --
@@ -3288,12 +3154,6 @@ INSERT INTO controlledvocabularyvalue VALUES (3, 1, 'D0', 'Arts and Humanities',
 INSERT INTO controlledvocabularyvalue VALUES (4, 2, 'D1', 'Astronomy and Astrophysics', 19);
 INSERT INTO controlledvocabularyvalue VALUES (5, 3, 'D2', 'Business and Management', 19);
 INSERT INTO controlledvocabularyvalue VALUES (6, 4, 'D3', 'Chemistry', 19);
-INSERT INTO controlledvocabularyvalue VALUES (7, 5, 'D4', 'Earth and Environmental Sciences', 19);
-INSERT INTO controlledvocabularyvalue VALUES (8, 6, 'D5', 'Engineering', 19);
-INSERT INTO controlledvocabularyvalue VALUES (9, 7, 'D6', 'Medicine, Health and Life Sciences', 19);
-INSERT INTO controlledvocabularyvalue VALUES (10, 8, 'D7', 'Computer and Information Science', 19);
-INSERT INTO controlledvocabularyvalue VALUES (11, 9, 'D8', 'Law', 19);
-INSERT INTO controlledvocabularyvalue VALUES (12, 10, 'D9', 'Mathematical Sciences', 19);
 INSERT INTO controlledvocabularyvalue VALUES (13, 11, 'D10', 'Physics', 19);
 INSERT INTO controlledvocabularyvalue VALUES (14, 12, 'D11', 'Social Sciences', 19);
 INSERT INTO controlledvocabularyvalue VALUES (15, 13, 'D12', 'Other', 19);
@@ -3420,6 +3280,11 @@ INSERT INTO controlledvocabularyvalue VALUES (135, 82, '', 'Kyrgyz', 34);
 INSERT INTO controlledvocabularyvalue VALUES (136, 83, '', 'Komi', 34);
 INSERT INTO controlledvocabularyvalue VALUES (137, 84, '', 'Kongo', 34);
 INSERT INTO controlledvocabularyvalue VALUES (138, 85, '', 'Korean', 34);
+INSERT INTO controlledvocabularyvalue VALUES (7, 6, 'D4', 'Earth and Environmental Sciences', 19);
+INSERT INTO controlledvocabularyvalue VALUES (8, 7, 'D5', 'Engineering', 19);
+INSERT INTO controlledvocabularyvalue VALUES (11, 8, 'D8', 'Law', 19);
+INSERT INTO controlledvocabularyvalue VALUES (12, 9, 'D9', 'Mathematical Sciences', 19);
+INSERT INTO controlledvocabularyvalue VALUES (9, 10, 'D6', 'Medicine, Health and Life Sciences', 19);
 INSERT INTO controlledvocabularyvalue VALUES (139, 86, '', 'Kurdish', 34);
 INSERT INTO controlledvocabularyvalue VALUES (140, 87, '', 'Kwanyama, Kuanyama', 34);
 INSERT INTO controlledvocabularyvalue VALUES (141, 88, '', 'Latin', 34);
@@ -4141,13 +4006,18 @@ INSERT INTO controlledvocabularyvalue VALUES (856, 28, 'sacla', 'SACLA - SACLA, 
 INSERT INTO controlledvocabularyvalue VALUES (857, 29, 'slri', 'SLRI - Synchrotron Light Research Institute', 168);
 INSERT INTO controlledvocabularyvalue VALUES (858, 30, 'spring8', 'SPRING8 - Super Photon ring 8 GeV', 168);
 INSERT INTO controlledvocabularyvalue VALUES (859, 31, 'ssrf', 'SSRF - Shanghai Synchrotron Radiation Facility', 168);
+INSERT INTO controlledvocabularyvalue VALUES (10, 5, 'D7', 'Computer and Information Science', 19);
+INSERT INTO controlledvocabularyvalue VALUES (860, 0, 'xray', 'X-Ray Diffraction', 227);
+INSERT INTO controlledvocabularyvalue VALUES (861, 1, 'sm', 'Structural Model', 227);
+INSERT INTO controlledvocabularyvalue VALUES (862, 2, 'me', 'Micro-Electron Diffraction', 227);
+INSERT INTO controlledvocabularyvalue VALUES (863, 3, 'llsm', 'Lattice Light-Sheet Microscopy', 227);
 
 
 --
 -- Name: controlledvocabularyvalue_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dvnapp
 --
 
-SELECT pg_catalog.setval('controlledvocabularyvalue_id_seq', 859, true);
+SELECT pg_catalog.setval('controlledvocabularyvalue_id_seq', 863, true);
 
 
 --
@@ -4292,83 +4162,78 @@ SELECT pg_catalog.setval('datasetfielddefaultvalue_id_seq', 1, false);
 INSERT INTO datasetfieldtype VALUES (1, true, false, false, 'Full title by which the Dataset is known.', '', true, 0, false, 'TEXT', 'title', true, 'Title', 'Enter title...', 1, NULL);
 INSERT INTO datasetfieldtype VALUES (2, false, false, false, 'A secondary title used to amplify or state certain limitations on the main title.', '', false, 1, false, 'TEXT', 'subtitle', false, 'Subtitle', '', 1, NULL);
 INSERT INTO datasetfieldtype VALUES (3, false, false, false, 'A title by which the work is commonly referred, or an abbreviation of the title.', '', false, 2, false, 'TEXT', 'alternativeTitle', false, 'Alternative Title', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (4, false, false, true, 'Another unique identifier that identifies this Dataset (e.g., producer''s or another repository''s number).', ':', false, 3, false, 'NONE', 'otherId', false, 'Other ID', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (5, false, false, false, 'Name of agency which generated this identifier.', '#VALUE', false, 4, false, 'TEXT', 'otherIdAgency', false, 'Agency', '', 1, 4);
-INSERT INTO datasetfieldtype VALUES (6, false, false, false, 'Other identifier that corresponds to this Dataset.', '#VALUE', false, 5, false, 'TEXT', 'otherIdValue', false, 'Identifier', '', 1, 4);
-INSERT INTO datasetfieldtype VALUES (7, false, false, true, 'The person(s), corporate body(ies), or agency(ies) responsible for creating the work.', '', true, 6, false, 'NONE', 'author', false, 'Author', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (8, true, false, false, 'The author''s Family Name, Given Name or the name of the organization responsible for this Dataset.', '#VALUE', true, 7, true, 'TEXT', 'authorName', true, 'Name', 'FamilyName, GivenName or Organization', 1, 7);
-INSERT INTO datasetfieldtype VALUES (9, true, false, false, 'The organization with which the author is affiliated.', '(#VALUE)', true, 8, true, 'TEXT', 'authorAffiliation', false, 'Affiliation', '', 1, 7);
-INSERT INTO datasetfieldtype VALUES (10, false, true, false, 'Name of the identifier scheme (ORCID, ISNI).', '- #VALUE:', true, 9, false, 'TEXT', 'authorIdentifierScheme', false, 'Identifier Scheme', '', 1, 7);
-INSERT INTO datasetfieldtype VALUES (11, false, false, false, 'Uniquely identifies an individual author or organization, according to various schemes.', '#VALUE', true, 10, false, 'TEXT', 'authorIdentifier', false, 'Identifier', '', 1, 7);
-INSERT INTO datasetfieldtype VALUES (12, false, false, true, 'The contact(s) for this Dataset.', '', true, 11, false, 'NONE', 'datasetContact', false, 'Contact', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (13, false, false, false, 'The contact''s Family Name, Given Name or the name of the organization.', '#VALUE', true, 12, false, 'TEXT', 'datasetContactName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 12);
-INSERT INTO datasetfieldtype VALUES (14, false, false, false, 'The organization with which the contact is affiliated.', '(#VALUE)', true, 13, false, 'TEXT', 'datasetContactAffiliation', false, 'Affiliation', '', 1, 12);
-INSERT INTO datasetfieldtype VALUES (15, false, false, false, 'The e-mail address(es) of the contact(s) for the Dataset. This will not be displayed.', '#EMAIL', true, 14, false, 'EMAIL', 'datasetContactEmail', true, 'E-mail', '', 1, 12);
-INSERT INTO datasetfieldtype VALUES (16, false, false, true, 'A summary describing the purpose, nature, and scope of the Dataset.', '', true, 15, false, 'NONE', 'dsDescription', false, 'Description', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (17, true, false, false, 'A summary describing the purpose, nature, and scope of the Dataset.', '#VALUE', true, 16, false, 'TEXTBOX', 'dsDescriptionValue', true, 'Text', '', 1, 16);
-INSERT INTO datasetfieldtype VALUES (18, false, false, false, 'In cases where a Dataset contains more than one description (for example, one might be supplied by the data producer and another prepared by the data repository where the data are deposited), the date attribute is used to distinguish between the two descriptions. The date attribute follows the ISO convention of YYYY-MM-DD.', '(#VALUE)', true, 17, false, 'DATE', 'dsDescriptionDate', false, 'Date', 'YYYY-MM-DD', 1, 16);
-INSERT INTO datasetfieldtype VALUES (19, true, true, true, 'Domain-specific Subject Categories that are topically relevant to the Dataset.', '', true, 18, true, 'TEXT', 'subject', true, 'Subject', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (20, false, false, true, 'Key terms that describe important aspects of the Dataset.', '', true, 19, false, 'NONE', 'keyword', false, 'Keyword', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (21, true, false, false, 'Key terms that describe important aspects of the Dataset. Can be used for building keyword indexes and for classification and retrieval purposes. A controlled vocabulary can be employed. The vocab attribute is provided for specification of the controlled vocabulary in use, such as LCSH, MeSH, or others. The vocabURI attribute specifies the location for the full controlled vocabulary.', '#VALUE', true, 20, true, 'TEXT', 'keywordValue', false, 'Term', '', 1, 20);
-INSERT INTO datasetfieldtype VALUES (22, false, false, false, 'For the specification of the keyword controlled vocabulary in use, such as LCSH, MeSH, or others.', '(#VALUE)', true, 21, false, 'TEXT', 'keywordVocabulary', false, 'Vocabulary', '', 1, 20);
-INSERT INTO datasetfieldtype VALUES (23, false, false, false, 'Keyword vocabulary URL points to the web presence that describes the keyword vocabulary, if appropriate. Enter an absolute URL where the keyword vocabulary web site is found, such as http://www.my.org.', '<a href="#VALUE">#VALUE</a>', true, 22, false, 'URL', 'keywordVocabularyURI', false, 'Vocabulary URL', 'Enter full URL, starting with http://', 1, 20);
-INSERT INTO datasetfieldtype VALUES (24, false, false, true, 'The classification field indicates the broad important topic(s) and subjects that the data cover. Library of Congress subject terms may be used here.  ', '', false, 23, false, 'NONE', 'topicClassification', false, 'Topic Classification', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (25, true, false, false, 'Topic or Subject term that is relevant to this Dataset.', '#VALUE', false, 24, true, 'TEXT', 'topicClassValue', false, 'Term', '', 1, 24);
-INSERT INTO datasetfieldtype VALUES (26, false, false, false, 'Provided for specification of the controlled vocabulary in use, e.g., LCSH, MeSH, etc.', '(#VALUE)', false, 25, false, 'TEXT', 'topicClassVocab', false, 'Vocabulary', '', 1, 24);
-INSERT INTO datasetfieldtype VALUES (27, false, false, false, 'Specifies the URL location for the full controlled vocabulary.', '<a href="#VALUE">#VALUE</a>', false, 26, false, 'URL', 'topicClassVocabURI', false, 'Vocabulary URL', 'Enter full URL, starting with http://', 1, 24);
-INSERT INTO datasetfieldtype VALUES (28, false, false, true, 'Publications that use the data from this Dataset.', '', false, 27, false, 'NONE', 'publication', false, 'Related Publication', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (29, true, false, false, 'The full bibliographic citation for this related publication.', '#VALUE', false, 28, false, 'TEXTBOX', 'publicationCitation', false, 'Citation', '', 1, 28);
-INSERT INTO datasetfieldtype VALUES (30, true, true, false, 'The type of digital identifier used for this publication (e.g., Digital Object Identifier (DOI)).', '#VALUE: ', false, 29, false, 'TEXT', 'publicationIDType', false, 'ID Type', '', 1, 28);
-INSERT INTO datasetfieldtype VALUES (31, true, false, false, 'The identifier for the selected ID type.', '#VALUE', false, 30, false, 'TEXT', 'publicationIDNumber', false, 'ID Number', '', 1, 28);
-INSERT INTO datasetfieldtype VALUES (32, false, false, false, 'Link to the publication web page (e.g., journal article page, archive record page, or other).', '<a href="#VALUE">#VALUE</a>', false, 31, false, 'URL', 'publicationURL', false, 'URL', 'Enter full URL, starting with http://', 1, 28);
-INSERT INTO datasetfieldtype VALUES (33, false, false, false, 'Additional important information about the Dataset.', '', true, 32, false, 'TEXTBOX', 'notesText', false, 'Notes', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (34, true, true, true, 'Language of the Dataset', '', false, 33, true, 'TEXT', 'language', false, 'Language', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (35, false, false, true, 'Person or organization with the financial or administrative responsibility over this Dataset', '', false, 34, false, 'NONE', 'producer', false, 'Producer', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (36, true, false, false, 'Producer name', '#VALUE', false, 35, true, 'TEXT', 'producerName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 35);
-INSERT INTO datasetfieldtype VALUES (37, false, false, false, 'The organization with which the producer is affiliated.', '(#VALUE)', false, 36, false, 'TEXT', 'producerAffiliation', false, 'Affiliation', '', 1, 35);
-INSERT INTO datasetfieldtype VALUES (38, false, false, false, 'The abbreviation by which the producer is commonly known. (ex. IQSS, ICPSR)', '(#VALUE)', false, 37, false, 'TEXT', 'producerAbbreviation', false, 'Abbreviation', '', 1, 35);
-INSERT INTO datasetfieldtype VALUES (39, false, false, false, 'Producer URL points to the producer''s web presence, if appropriate. Enter an absolute URL where the producer''s web site is found, such as http://www.my.org.  ', '<a href="#VALUE">#VALUE</a>', false, 38, false, 'URL', 'producerURL', false, 'URL', 'Enter full URL, starting with http://', 1, 35);
-INSERT INTO datasetfieldtype VALUES (40, false, false, false, 'URL for the producer''s logo, which points to this  producer''s web-accessible logo image. Enter an absolute URL where the producer''s logo image is found, such as http://www.my.org/images/logo.gif.', '<img src="#VALUE" alt="#NAME" class="metadata-logo"/><br/>', false, 39, false, 'URL', 'producerLogoURL', false, 'Logo URL', 'Enter full URL for image, starting with http://', 1, 35);
-INSERT INTO datasetfieldtype VALUES (41, true, false, false, 'Date when the data collection or other materials were produced (not distributed, published or archived).', '', false, 40, true, 'DATE', 'productionDate', false, 'Production Date', 'YYYY-MM-DD', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (42, false, false, false, 'The location where the data collection and any other related materials were produced.', '', false, 41, false, 'TEXT', 'productionPlace', false, 'Production Place', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (43, false, false, true, 'The organization or person responsible for either collecting, managing, or otherwise contributing in some form to the development of the resource.', ':', false, 42, false, 'NONE', 'contributor', false, 'Contributor', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (44, true, true, false, 'The type of contributor of the  resource.  ', '#VALUE ', false, 43, true, 'TEXT', 'contributorType', false, 'Type', '', 1, 43);
-INSERT INTO datasetfieldtype VALUES (45, true, false, false, 'The Family Name, Given Name or organization name of the contributor.', '#VALUE', false, 44, true, 'TEXT', 'contributorName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 43);
-INSERT INTO datasetfieldtype VALUES (46, false, false, true, 'Grant Information', ':', false, 45, false, 'NONE', 'grantNumber', false, 'Grant Information', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (47, false, false, false, 'Grant Number Agency', '#VALUE', false, 46, false, 'TEXT', 'grantNumberAgency', false, 'Grant Agency', '', 1, 46);
-INSERT INTO datasetfieldtype VALUES (48, false, false, false, 'The grant or contract number of the project that  sponsored the effort.', '#VALUE', false, 47, false, 'TEXT', 'grantNumberValue', false, 'Grant Number', '', 1, 46);
-INSERT INTO datasetfieldtype VALUES (49, false, false, true, 'The organization designated by the author or producer to generate copies of the particular work including any necessary editions or revisions.', '', false, 48, false, 'NONE', 'distributor', false, 'Distributor', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (50, true, false, false, 'Distributor name', '#VALUE', false, 49, true, 'TEXT', 'distributorName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 49);
-INSERT INTO datasetfieldtype VALUES (51, false, false, false, 'The organization with which the distributor contact is affiliated.', '(#VALUE)', false, 50, false, 'TEXT', 'distributorAffiliation', false, 'Affiliation', '', 1, 49);
-INSERT INTO datasetfieldtype VALUES (52, false, false, false, 'The abbreviation by which this distributor is commonly known (e.g., IQSS, ICPSR).', '(#VALUE)', false, 51, false, 'TEXT', 'distributorAbbreviation', false, 'Abbreviation', '', 1, 49);
-INSERT INTO datasetfieldtype VALUES (53, false, false, false, 'Distributor URL points to the distributor''s web presence, if appropriate. Enter an absolute URL where the distributor''s web site is found, such as http://www.my.org.', '<a href="#VALUE">#VALUE</a>', false, 52, false, 'URL', 'distributorURL', false, 'URL', 'Enter full URL, starting with http://', 1, 49);
-INSERT INTO datasetfieldtype VALUES (54, false, false, false, 'URL of the distributor''s logo, which points to this  distributor''s web-accessible logo image. Enter an absolute URL where the distributor''s logo image is found, such as http://www.my.org/images/logo.gif.', '<img src="#VALUE" alt="#NAME" class="metadata-logo"/><br/>', false, 53, false, 'URL', 'distributorLogoURL', false, 'Logo URL', 'Enter full URL for image, starting with http://', 1, 49);
-INSERT INTO datasetfieldtype VALUES (55, true, false, false, 'Date that the work was made available for distribution/presentation.', '', false, 54, true, 'DATE', 'distributionDate', false, 'Distribution Date', 'YYYY-MM-DD', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (56, false, false, false, 'The person (Family Name, Given Name) or the name of the organization that deposited this Dataset to the repository.', '', false, 55, false, 'TEXT', 'depositor', false, 'Depositor', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (57, false, false, false, 'Date that the Dataset was deposited into the repository.', '', false, 56, true, 'DATE', 'dateOfDeposit', false, 'Deposit Date', 'YYYY-MM-DD', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (58, false, false, true, 'Time period to which the data refer. This item reflects the time period covered by the data, not the dates of coding or making documents machine-readable or the dates the data were collected. Also known as span.', ';', false, 57, false, 'NONE', 'timePeriodCovered', false, 'Time Period Covered', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (59, true, false, false, 'Start date which reflects the time period covered by the data, not the dates of coding or making documents machine-readable or the dates the data were collected.', '#NAME: #VALUE ', false, 58, true, 'DATE', 'timePeriodCoveredStart', false, 'Start', 'YYYY-MM-DD', 1, 58);
-INSERT INTO datasetfieldtype VALUES (60, true, false, false, 'End date which reflects the time period covered by the data, not the dates of coding or making documents machine-readable or the dates the data were collected.', '#NAME: #VALUE ', false, 59, true, 'DATE', 'timePeriodCoveredEnd', false, 'End', 'YYYY-MM-DD', 1, 58);
-INSERT INTO datasetfieldtype VALUES (61, false, false, true, 'Contains the date(s) when the data were collected.', ';', false, 60, false, 'NONE', 'dateOfCollection', false, 'Date of Collection', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (62, false, false, false, 'Date when the data collection started.', '#NAME: #VALUE ', false, 61, false, 'DATE', 'dateOfCollectionStart', false, 'Start', 'YYYY-MM-DD', 1, 61);
-INSERT INTO datasetfieldtype VALUES (63, false, false, false, 'Date when the data collection ended.', '#NAME: #VALUE ', false, 62, false, 'DATE', 'dateOfCollectionEnd', false, 'End', 'YYYY-MM-DD', 1, 61);
-INSERT INTO datasetfieldtype VALUES (64, true, false, true, 'Type of data included in the file: survey data, census/enumeration data, aggregate data, clinical data, event/transaction data, program source code, machine-readable text, administrative records data, experimental data, psychological test, textual data, coded textual, coded documents, time budget diaries, observation data/ratings, process-produced data, or other.', '', false, 63, true, 'TEXT', 'kindOfData', false, 'Kind of Data', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (65, false, false, false, 'Information about the Dataset series.', ':', false, 64, false, 'NONE', 'series', false, 'Series', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (66, true, false, false, 'Name of the dataset series to which the Dataset belongs.', '#VALUE', false, 65, true, 'TEXT', 'seriesName', false, 'Name', '', 1, 65);
-INSERT INTO datasetfieldtype VALUES (67, false, false, false, 'History of the series and summary of those features that apply to the series as a whole.', '#VALUE', false, 66, false, 'TEXTBOX', 'seriesInformation', false, 'Information', '', 1, 65);
-INSERT INTO datasetfieldtype VALUES (68, false, false, true, 'Information about the software used to generate the Dataset.', ',', false, 67, false, 'NONE', 'software', false, 'Software', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (69, false, true, false, 'Name of software used to generate the Dataset.', '#VALUE', false, 68, false, 'TEXT', 'softwareName', false, 'Name', '', 1, 68);
-INSERT INTO datasetfieldtype VALUES (70, false, false, false, 'Version of the software used to generate the Dataset.', '#NAME: #VALUE', false, 69, false, 'TEXT', 'softwareVersion', false, 'Version', '', 1, 68);
-INSERT INTO datasetfieldtype VALUES (71, false, false, true, 'Any material related to this Dataset.', '', false, 70, false, 'TEXTBOX', 'relatedMaterial', false, 'Related Material', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (72, false, false, true, 'Any Datasets that are related to this Dataset, such as previous research on this subject.', '', false, 71, false, 'TEXTBOX', 'relatedDatasets', false, 'Related Datasets', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (73, false, false, true, 'Any references that would serve as background or supporting material to this Dataset.', '', false, 72, false, 'TEXT', 'otherReferences', false, 'Other References', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (74, false, false, true, 'List of books, articles, serials, or machine-readable data files that served as the sources of the data collection.', '', false, 73, false, 'TEXTBOX', 'dataSources', false, 'Data Sources', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (75, false, false, false, 'For historical materials, information about the origin of the sources and the rules followed in establishing the sources should be specified.', '', false, 74, false, 'TEXTBOX', 'originOfSources', false, 'Origin of Sources', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (76, false, false, false, 'Assessment of characteristics and source material.', '', false, 75, false, 'TEXTBOX', 'characteristicOfSources', false, 'Characteristic of Sources Noted', '', 1, NULL);
-INSERT INTO datasetfieldtype VALUES (77, false, false, false, 'Level of documentation of the original sources.', '', false, 76, false, 'TEXTBOX', 'accessToSources', false, 'Documentation and Access to Sources', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (5, false, false, false, 'Name of agency which generated this identifier.', '#VALUE', false, 5, false, 'TEXT', 'otherIdAgency', false, 'Agency', '', 1, 4);
+INSERT INTO datasetfieldtype VALUES (6, false, false, false, 'Other identifier that corresponds to this Dataset.', '#VALUE', false, 6, false, 'TEXT', 'otherIdValue', false, 'Identifier', '', 1, 4);
+INSERT INTO datasetfieldtype VALUES (7, false, false, true, 'The person(s), corporate body(ies), or agency(ies) responsible for creating the work.', '', true, 7, false, 'NONE', 'author', false, 'Author', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (9, true, false, false, 'The organization with which the author is affiliated.', '(#VALUE)', true, 9, true, 'TEXT', 'authorAffiliation', false, 'Affiliation', '', 1, 7);
+INSERT INTO datasetfieldtype VALUES (10, false, true, false, 'Name of the identifier scheme (ORCID, ISNI).', '- #VALUE:', true, 10, false, 'TEXT', 'authorIdentifierScheme', false, 'Identifier Scheme', '', 1, 7);
+INSERT INTO datasetfieldtype VALUES (11, false, false, false, 'Uniquely identifies an individual author or organization, according to various schemes.', '#VALUE', true, 11, false, 'TEXT', 'authorIdentifier', false, 'Identifier', '', 1, 7);
+INSERT INTO datasetfieldtype VALUES (12, false, false, true, 'The contact(s) for this Dataset.', '', true, 12, false, 'NONE', 'datasetContact', false, 'Contact', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (13, false, false, false, 'The contact''s Family Name, Given Name or the name of the organization.', '#VALUE', true, 13, false, 'TEXT', 'datasetContactName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 12);
+INSERT INTO datasetfieldtype VALUES (14, false, false, false, 'The organization with which the contact is affiliated.', '(#VALUE)', true, 14, false, 'TEXT', 'datasetContactAffiliation', false, 'Affiliation', '', 1, 12);
+INSERT INTO datasetfieldtype VALUES (15, false, false, false, 'The e-mail address(es) of the contact(s) for the Dataset. This will not be displayed.', '#EMAIL', true, 15, false, 'EMAIL', 'datasetContactEmail', true, 'E-mail', '', 1, 12);
+INSERT INTO datasetfieldtype VALUES (16, false, false, true, 'A summary describing the purpose, nature, and scope of the Dataset.', '', true, 16, false, 'NONE', 'dsDescription', false, 'Description', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (17, true, false, false, 'A summary describing the purpose, nature, and scope of the Dataset.', '#VALUE', true, 17, false, 'TEXTBOX', 'dsDescriptionValue', true, 'Text', '', 1, 16);
+INSERT INTO datasetfieldtype VALUES (19, true, true, true, 'Domain-specific Subject Categories that are topically relevant to the Dataset.', '', true, 19, true, 'TEXT', 'subject', true, 'Subject', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (20, false, false, true, 'Key terms that describe important aspects of the Dataset.', '', true, 20, false, 'NONE', 'keyword', false, 'Keyword', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (21, true, false, false, 'Key terms that describe important aspects of the Dataset. Can be used for building keyword indexes and for classification and retrieval purposes. A controlled vocabulary can be employed. The vocab attribute is provided for specification of the controlled vocabulary in use, such as LCSH, MeSH, or others. The vocabURI attribute specifies the location for the full controlled vocabulary.', '#VALUE', true, 21, true, 'TEXT', 'keywordValue', false, 'Term', '', 1, 20);
+INSERT INTO datasetfieldtype VALUES (22, false, false, false, 'For the specification of the keyword controlled vocabulary in use, such as LCSH, MeSH, or others.', '(#VALUE)', true, 22, false, 'TEXT', 'keywordVocabulary', false, 'Vocabulary', '', 1, 20);
+INSERT INTO datasetfieldtype VALUES (23, false, false, false, 'Keyword vocabulary URL points to the web presence that describes the keyword vocabulary, if appropriate. Enter an absolute URL where the keyword vocabulary web site is found, such as http://www.my.org.', '<a href="#VALUE">#VALUE</a>', true, 23, false, 'URL', 'keywordVocabularyURI', false, 'Vocabulary URL', 'Enter full URL, starting with http://', 1, 20);
+INSERT INTO datasetfieldtype VALUES (24, false, false, true, 'The classification field indicates the broad important topic(s) and subjects that the data cover. Library of Congress subject terms may be used here.  ', '', false, 24, false, 'NONE', 'topicClassification', false, 'Topic Classification', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (25, true, false, false, 'Topic or Subject term that is relevant to this Dataset.', '#VALUE', false, 25, true, 'TEXT', 'topicClassValue', false, 'Term', '', 1, 24);
+INSERT INTO datasetfieldtype VALUES (26, false, false, false, 'Provided for specification of the controlled vocabulary in use, e.g., LCSH, MeSH, etc.', '(#VALUE)', false, 26, false, 'TEXT', 'topicClassVocab', false, 'Vocabulary', '', 1, 24);
+INSERT INTO datasetfieldtype VALUES (27, false, false, false, 'Specifies the URL location for the full controlled vocabulary.', '<a href="#VALUE">#VALUE</a>', false, 27, false, 'URL', 'topicClassVocabURI', false, 'Vocabulary URL', 'Enter full URL, starting with http://', 1, 24);
+INSERT INTO datasetfieldtype VALUES (28, false, false, true, 'Publications that use the data from this Dataset.', '', false, 28, false, 'NONE', 'publication', false, 'Related Publication', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (29, true, false, false, 'The full bibliographic citation for this related publication.', '#VALUE', false, 29, false, 'TEXTBOX', 'publicationCitation', false, 'Citation', '', 1, 28);
+INSERT INTO datasetfieldtype VALUES (30, true, true, false, 'The type of digital identifier used for this publication (e.g., Digital Object Identifier (DOI)).', '#VALUE: ', false, 30, false, 'TEXT', 'publicationIDType', false, 'ID Type', '', 1, 28);
+INSERT INTO datasetfieldtype VALUES (31, true, false, false, 'The identifier for the selected ID type.', '#VALUE', false, 31, false, 'TEXT', 'publicationIDNumber', false, 'ID Number', '', 1, 28);
+INSERT INTO datasetfieldtype VALUES (32, false, false, false, 'Link to the publication web page (e.g., journal article page, archive record page, or other).', '<a href="#VALUE">#VALUE</a>', false, 32, false, 'URL', 'publicationURL', false, 'URL', 'Enter full URL, starting with http://', 1, 28);
+INSERT INTO datasetfieldtype VALUES (33, false, false, false, 'Additional important information about the Dataset.', '', true, 33, false, 'TEXTBOX', 'notesText', false, 'Notes', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (34, true, true, true, 'Language of the Dataset', '', false, 34, true, 'TEXT', 'language', false, 'Language', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (35, false, false, true, 'Person or organization with the financial or administrative responsibility over this Dataset', '', false, 35, false, 'NONE', 'producer', false, 'Producer', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (36, true, false, false, 'Producer name', '#VALUE', false, 36, true, 'TEXT', 'producerName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 35);
+INSERT INTO datasetfieldtype VALUES (37, false, false, false, 'The organization with which the producer is affiliated.', '(#VALUE)', false, 37, false, 'TEXT', 'producerAffiliation', false, 'Affiliation', '', 1, 35);
+INSERT INTO datasetfieldtype VALUES (38, false, false, false, 'The abbreviation by which the producer is commonly known. (ex. IQSS, ICPSR)', '(#VALUE)', false, 38, false, 'TEXT', 'producerAbbreviation', false, 'Abbreviation', '', 1, 35);
+INSERT INTO datasetfieldtype VALUES (39, false, false, false, 'Producer URL points to the producer''s web presence, if appropriate. Enter an absolute URL where the producer''s web site is found, such as http://www.my.org.  ', '<a href="#VALUE">#VALUE</a>', false, 39, false, 'URL', 'producerURL', false, 'URL', 'Enter full URL, starting with http://', 1, 35);
+INSERT INTO datasetfieldtype VALUES (40, false, false, false, 'URL for the producer''s logo, which points to this  producer''s web-accessible logo image. Enter an absolute URL where the producer''s logo image is found, such as http://www.my.org/images/logo.gif.', '<img src="#VALUE" alt="#NAME" class="metadata-logo"/><br/>', false, 40, false, 'URL', 'producerLogoURL', false, 'Logo URL', 'Enter full URL for image, starting with http://', 1, 35);
 INSERT INTO datasetfieldtype VALUES (78, false, false, true, 'Information on the geographic coverage of the data. Includes the total geographic scope of the data.', '', false, 0, false, 'NONE', 'geographicCoverage', false, 'Geographic Coverage', '', 2, NULL);
 INSERT INTO datasetfieldtype VALUES (79, true, true, false, 'The country or nation that the Dataset is about.', '', false, 1, true, 'TEXT', 'country', false, 'Country / Nation', '', 2, 78);
 INSERT INTO datasetfieldtype VALUES (80, true, false, false, 'The state or province that the Dataset is about. Use GeoNames for correct spelling and avoid abbreviations.', '', false, 2, true, 'TEXT', 'state', false, 'State / Province', '', 2, 78);
+INSERT INTO datasetfieldtype VALUES (42, false, false, false, 'The location where the data collection and any other related materials were produced.', '', false, 42, false, 'TEXT', 'productionPlace', false, 'Production Place', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (43, false, false, true, 'The organization or person responsible for either collecting, managing, or otherwise contributing in some form to the development of the resource.', ':', false, 43, false, 'NONE', 'contributor', false, 'Contributor', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (44, true, true, false, 'The type of contributor of the  resource.  ', '#VALUE ', false, 44, true, 'TEXT', 'contributorType', false, 'Type', '', 1, 43);
+INSERT INTO datasetfieldtype VALUES (45, true, false, false, 'The Family Name, Given Name or organization name of the contributor.', '#VALUE', false, 45, true, 'TEXT', 'contributorName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 43);
+INSERT INTO datasetfieldtype VALUES (46, false, false, true, 'Grant Information', ':', false, 46, false, 'NONE', 'grantNumber', false, 'Grant Information', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (47, false, false, false, 'Grant Number Agency', '#VALUE', false, 47, false, 'TEXT', 'grantNumberAgency', false, 'Grant Agency', '', 1, 46);
+INSERT INTO datasetfieldtype VALUES (48, false, false, false, 'The grant or contract number of the project that  sponsored the effort.', '#VALUE', false, 48, false, 'TEXT', 'grantNumberValue', false, 'Grant Number', '', 1, 46);
+INSERT INTO datasetfieldtype VALUES (49, false, false, true, 'The organization designated by the author or producer to generate copies of the particular work including any necessary editions or revisions.', '', false, 49, false, 'NONE', 'distributor', false, 'Distributor', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (50, true, false, false, 'Distributor name', '#VALUE', false, 50, true, 'TEXT', 'distributorName', false, 'Name', 'FamilyName, GivenName or Organization', 1, 49);
+INSERT INTO datasetfieldtype VALUES (51, false, false, false, 'The organization with which the distributor contact is affiliated.', '(#VALUE)', false, 51, false, 'TEXT', 'distributorAffiliation', false, 'Affiliation', '', 1, 49);
+INSERT INTO datasetfieldtype VALUES (52, false, false, false, 'The abbreviation by which this distributor is commonly known (e.g., IQSS, ICPSR).', '(#VALUE)', false, 52, false, 'TEXT', 'distributorAbbreviation', false, 'Abbreviation', '', 1, 49);
+INSERT INTO datasetfieldtype VALUES (54, false, false, false, 'URL of the distributor''s logo, which points to this  distributor''s web-accessible logo image. Enter an absolute URL where the distributor''s logo image is found, such as http://www.my.org/images/logo.gif.', '<img src="#VALUE" alt="#NAME" class="metadata-logo"/><br/>', false, 54, false, 'URL', 'distributorLogoURL', false, 'Logo URL', 'Enter full URL for image, starting with http://', 1, 49);
+INSERT INTO datasetfieldtype VALUES (55, true, false, false, 'Date that the work was made available for distribution/presentation.', '', false, 55, true, 'DATE', 'distributionDate', false, 'Distribution Date', 'YYYY-MM-DD', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (56, false, false, false, 'The person (Family Name, Given Name) or the name of the organization that deposited this Dataset to the repository.', '', false, 56, false, 'TEXT', 'depositor', false, 'Depositor', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (57, false, false, false, 'Date that the Dataset was deposited into the repository.', '', false, 57, true, 'DATE', 'dateOfDeposit', false, 'Deposit Date', 'YYYY-MM-DD', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (58, false, false, true, 'Time period to which the data refer. This item reflects the time period covered by the data, not the dates of coding or making documents machine-readable or the dates the data were collected. Also known as span.', ';', false, 58, false, 'NONE', 'timePeriodCovered', false, 'Time Period Covered', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (59, true, false, false, 'Start date which reflects the time period covered by the data, not the dates of coding or making documents machine-readable or the dates the data were collected.', '#NAME: #VALUE ', false, 59, true, 'DATE', 'timePeriodCoveredStart', false, 'Start', 'YYYY-MM-DD', 1, 58);
+INSERT INTO datasetfieldtype VALUES (60, true, false, false, 'End date which reflects the time period covered by the data, not the dates of coding or making documents machine-readable or the dates the data were collected.', '#NAME: #VALUE ', false, 60, true, 'DATE', 'timePeriodCoveredEnd', false, 'End', 'YYYY-MM-DD', 1, 58);
+INSERT INTO datasetfieldtype VALUES (61, false, false, true, 'Contains the date(s) when the data were collected.', ';', false, 61, false, 'NONE', 'dateOfCollection', false, 'Date of Collection', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (62, false, false, false, 'Date when the data collection started.', '#NAME: #VALUE ', false, 62, false, 'DATE', 'dateOfCollectionStart', false, 'Start', 'YYYY-MM-DD', 1, 61);
+INSERT INTO datasetfieldtype VALUES (63, false, false, false, 'Date when the data collection ended.', '#NAME: #VALUE ', false, 63, false, 'DATE', 'dateOfCollectionEnd', false, 'End', 'YYYY-MM-DD', 1, 61);
+INSERT INTO datasetfieldtype VALUES (64, true, false, true, 'Type of data included in the file: survey data, census/enumeration data, aggregate data, clinical data, event/transaction data, program source code, machine-readable text, administrative records data, experimental data, psychological test, textual data, coded textual, coded documents, time budget diaries, observation data/ratings, process-produced data, or other.', '', false, 64, true, 'TEXT', 'kindOfData', false, 'Kind of Data', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (65, false, false, false, 'Information about the Dataset series.', ':', false, 65, false, 'NONE', 'series', false, 'Series', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (66, true, false, false, 'Name of the dataset series to which the Dataset belongs.', '#VALUE', false, 66, true, 'TEXT', 'seriesName', false, 'Name', '', 1, 65);
+INSERT INTO datasetfieldtype VALUES (67, false, false, false, 'History of the series and summary of those features that apply to the series as a whole.', '#VALUE', false, 67, false, 'TEXTBOX', 'seriesInformation', false, 'Information', '', 1, 65);
+INSERT INTO datasetfieldtype VALUES (68, false, false, true, 'Information about the software used to generate the Dataset.', ',', false, 68, false, 'NONE', 'software', false, 'Software', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (69, false, true, false, 'Name of software used to generate the Dataset.', '#VALUE', false, 69, false, 'TEXT', 'softwareName', false, 'Name', '', 1, 68);
+INSERT INTO datasetfieldtype VALUES (70, false, false, false, 'Version of the software used to generate the Dataset.', '#NAME: #VALUE', false, 70, false, 'TEXT', 'softwareVersion', false, 'Version', '', 1, 68);
+INSERT INTO datasetfieldtype VALUES (71, false, false, true, 'Any material related to this Dataset.', '', false, 71, false, 'TEXTBOX', 'relatedMaterial', false, 'Related Material', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (72, false, false, true, 'Any Datasets that are related to this Dataset, such as previous research on this subject.', '', false, 72, false, 'TEXTBOX', 'relatedDatasets', false, 'Related Datasets', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (73, false, false, true, 'Any references that would serve as background or supporting material to this Dataset.', '', false, 73, false, 'TEXT', 'otherReferences', false, 'Other References', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (74, false, false, true, 'List of books, articles, serials, or machine-readable data files that served as the sources of the data collection.', '', false, 74, false, 'TEXTBOX', 'dataSources', false, 'Data Sources', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (75, false, false, false, 'For historical materials, information about the origin of the sources and the rules followed in establishing the sources should be specified.', '', false, 75, false, 'TEXTBOX', 'originOfSources', false, 'Origin of Sources', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (76, false, false, false, 'Assessment of characteristics and source material.', '', false, 76, false, 'TEXTBOX', 'characteristicOfSources', false, 'Characteristic of Sources Noted', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (77, false, false, false, 'Level of documentation of the original sources.', '', false, 77, false, 'TEXTBOX', 'accessToSources', false, 'Documentation and Access to Sources', '', 1, NULL);
 INSERT INTO datasetfieldtype VALUES (81, true, false, false, 'The name of the city that the Dataset is about. Use GeoNames for correct spelling and avoid abbreviations.', '', false, 3, true, 'TEXT', 'city', false, 'City', '', 2, 78);
 INSERT INTO datasetfieldtype VALUES (82, false, false, false, 'Other information on the geographic coverage of the data.', '', false, 4, false, 'TEXT', 'otherGeographicCoverage', false, 'Other', '', 2, 78);
 INSERT INTO datasetfieldtype VALUES (83, true, false, true, 'Lowest level of geographic aggregation covered by the Dataset, e.g., village, county, region.', '', false, 5, true, 'TEXT', 'geographicUnit', false, 'Geographic Unit', '', 2, NULL);
@@ -4514,13 +4379,20 @@ INSERT INTO datasetfieldtype VALUES (222, false, false, false, '', '#VALUE', fal
 INSERT INTO datasetfieldtype VALUES (223, false, false, false, '', '#VALUE', false, 53, false, 'FLOAT', 'reprocCellAngle2', false, 'Cell angle 2', '', 9, 170);
 INSERT INTO datasetfieldtype VALUES (224, false, false, false, '', '#VALUE', false, 54, false, 'FLOAT', 'reprocCellAngle3', false, 'Cell angle 3', '', 9, 170);
 INSERT INTO datasetfieldtype VALUES (225, false, false, false, '', '#VALUE', false, 55, false, 'TEXT', 'reprocSpacegroup', false, 'Spacegroup', '', 9, 170);
+INSERT INTO datasetfieldtype VALUES (226, false, false, false, 'A URL where the dataset can be viewed, such as a personal or project website.  ', '', false, 3, false, 'URL', 'alternativeURL', false, 'Alternative URL', 'Enter full URL, starting with http://', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (4, false, false, true, 'Another unique identifier that identifies this Dataset (e.g., producer''s or another repository''s number).', ':', false, 4, false, 'NONE', 'otherId', false, 'Other ID', '', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (8, true, false, false, 'The author''s Family Name, Given Name or the name of the organization responsible for this Dataset.', '#VALUE', true, 8, true, 'TEXT', 'authorName', true, 'Name', 'FamilyName, GivenName or Organization', 1, 7);
+INSERT INTO datasetfieldtype VALUES (18, false, false, false, 'In cases where a Dataset contains more than one description (for example, one might be supplied by the data producer and another prepared by the data repository where the data are deposited), the date attribute is used to distinguish between the two descriptions. The date attribute follows the ISO convention of YYYY-MM-DD.', '(#VALUE)', true, 18, false, 'DATE', 'dsDescriptionDate', false, 'Date', 'YYYY-MM-DD', 1, 16);
+INSERT INTO datasetfieldtype VALUES (41, true, false, false, 'Date when the data collection or other materials were produced (not distributed, published or archived).', '', false, 41, true, 'DATE', 'productionDate', false, 'Production Date', 'YYYY-MM-DD', 1, NULL);
+INSERT INTO datasetfieldtype VALUES (53, false, false, false, 'Distributor URL points to the distributor''s web presence, if appropriate. Enter an absolute URL where the distributor''s web site is found, such as http://www.my.org.', '<a href="#VALUE">#VALUE</a>', false, 53, false, 'URL', 'distributorURL', false, 'URL', 'Enter full URL, starting with http://', 1, 49);
+INSERT INTO datasetfieldtype VALUES (227, true, true, false, 'We currently support X-ray diffraction datasets. If you would like to deposit any other dataset type please contact us first.', '', true, 78, true, 'TEXT', 'dataType', false, 'Data Type', '', 1, NULL);
 
 
 --
 -- Name: datasetfieldtype_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dvnapp
 --
 
-SELECT pg_catalog.setval('datasetfieldtype_id_seq', 225, true);
+SELECT pg_catalog.setval('datasetfieldtype_id_seq', 227, true);
 
 
 --
@@ -4618,7 +4490,7 @@ SELECT pg_catalog.setval('datavariable_id_seq', 1, false);
 -- Data for Name: dataverse; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO dataverse VALUES (1, NULL, 'root', 'UNCATEGORIZED', 'The root dataverse.', true, false, true, 'Root', true, false, true, 6, NULL, NULL, NULL);
+INSERT INTO dataverse VALUES (1, 'Harvard University Medical School', 'root', 'UNCATEGORIZED', '<h3>We support publication of X-ray diffraction, MicroED, LLSM datasets, as well as structural models. All visitors can access our Laboratory and Institutional Collections. All structural biologists are invited to deposit datasets.</h3>', true, false, true, 'SBGrid Data Bank', true, false, true, 6, NULL, NULL, NULL);
 
 
 --
@@ -4634,7 +4506,6 @@ INSERT INTO dataverse VALUES (1, NULL, 'root', 'UNCATEGORIZED', 'The root datave
 INSERT INTO dataverse_metadatablock VALUES (1, 1);
 INSERT INTO dataverse_metadatablock VALUES (1, 8);
 INSERT INTO dataverse_metadatablock VALUES (1, 7);
-INSERT INTO dataverse_metadatablock VALUES (1, 9);
 
 
 --
@@ -4655,17 +4526,17 @@ SELECT pg_catalog.setval('dataversecontact_id_seq', 1, true);
 -- Data for Name: dataversefacet; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO dataversefacet VALUES (1, 2, 21, 1);
-INSERT INTO dataversefacet VALUES (2, 1, 19, 1);
-INSERT INTO dataversefacet VALUES (3, 0, 8, 1);
-INSERT INTO dataversefacet VALUES (4, 3, 57, 1);
+INSERT INTO dataversefacet VALUES (5, 2, 21, 1);
+INSERT INTO dataversefacet VALUES (6, 0, 8, 1);
+INSERT INTO dataversefacet VALUES (7, 1, 19, 1);
+INSERT INTO dataversefacet VALUES (8, 3, 57, 1);
 
 
 --
 -- Name: dataversefacet_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dvnapp
 --
 
-SELECT pg_catalog.setval('dataversefacet_id_seq', 4, true);
+SELECT pg_catalog.setval('dataversefacet_id_seq', 8, true);
 
 
 --
@@ -4777,7 +4648,7 @@ SELECT pg_catalog.setval('doidataciteregistercache_id_seq', 1, false);
 -- Data for Name: dvobject; Type: TABLE DATA; Schema: public; Owner: dvnapp
 --
 
-INSERT INTO dvobject VALUES (1, 'Dataverse', '2016-03-03 15:34:03.07', NULL, '2016-11-17 18:26:33.012', '2016-11-17 18:26:33.079', '2016-03-03 15:34:03.544', false, '2016-11-17 18:26:33.012', 1, NULL, 1);
+INSERT INTO dvobject VALUES (1, 'Dataverse', '2016-03-03 15:34:03.07', NULL, '2016-12-21 11:50:31.901', '2016-11-17 18:26:33.079', '2016-03-03 15:34:03.544', false, '2016-11-17 18:26:33.012', 1, NULL, 1);
 
 
 --
@@ -5113,6 +4984,9 @@ INSERT INTO setting VALUES (':DoiSeparator', '/');
 INSERT INTO setting VALUES ('BuiltinUsers.KEY', 'burrito');
 INSERT INTO setting VALUES (':BlockedApiKey', 'empanada');
 INSERT INTO setting VALUES (':BlockedApiPolicy', 'localhost-only');
+INSERT INTO setting VALUES (':StatusMessageHeader', 'Beta: for testing only');
+INSERT INTO setting VALUES (':BlockedApiEndpoints', 'admin,test');
+INSERT INTO setting VALUES (':AllowSignUps', 'false');
 
 
 --
