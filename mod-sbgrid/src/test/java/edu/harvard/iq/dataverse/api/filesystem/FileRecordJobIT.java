@@ -261,7 +261,7 @@ public class FileRecordJobIT {
 
             // validate job
             JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
             Map<String, Long> metrics = step1.getMetrics();
             assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
@@ -359,7 +359,7 @@ public class FileRecordJobIT {
 
             // validate job
             JobExecutionEntity job = getJobWithToken(contribToken);
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
             Map<String, Long> metrics = step1.getMetrics();
             assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
@@ -643,7 +643,7 @@ public class FileRecordJobIT {
 
             // validate job
             JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
             Map<String, Long> metrics = step1.getMetrics();
             assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
@@ -703,8 +703,8 @@ public class FileRecordJobIT {
             }
 
             // validate job again
-            JobExecutionEntity newJob = getJob();
-            assertEquals(newJob.getSteps().size(), 2);
+            JobExecutionEntity newJob = getJobWithMode("MERGE");
+            assertEquals(newJob.getSteps().size(), 1);
             StepExecutionEntity newSteps = newJob.getSteps().get(0);
             Map<String, Long> newMetrics = newSteps.getMetrics();
             assertEquals(newJob.getExitStatus(), BatchStatus.COMPLETED.name());
@@ -776,11 +776,9 @@ public class FileRecordJobIT {
             }
 
             JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
-            StepExecutionEntity step2 = job.getSteps().get(1);
             Map<String, Long> metrics1 = step1.getMetrics();
-            Map<String, Long> metrics2 = step2.getMetrics();
             // check job status
             assertEquals(BatchStatus.COMPLETED.name(), job.getExitStatus());
             assertEquals(BatchStatus.COMPLETED, job.getStatus());
@@ -799,21 +797,6 @@ public class FileRecordJobIT {
             assertEquals((long) metrics1.get("read_count"), 2);
             // should be no user data (error messages)
             assertEquals(step1.getPersistentUserData(), null);
-            // check step 2 status and name
-            assertEquals(step2.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(step2.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(step2.getName(), "import-checksums");
-            // verify step 2 metrics
-            assertEquals((long) metrics2.get("write_skip_count"), 0);
-            assertEquals((long) metrics2.get("commit_count"), 1);
-            assertEquals((long) metrics2.get("process_skip_count"), 0);
-            assertEquals((long) metrics2.get("read_skip_count"), 0);
-            assertEquals((long) metrics2.get("write_count"), 2);
-            assertEquals((long) metrics2.get("rollback_count"), 0);
-            assertEquals((long) metrics2.get("filter_count"), 0);
-            assertEquals((long) metrics2.get("read_count"), 2);
-            // should be no user data (error messages)
-            assertEquals(step2.getPersistentUserData(), null);
 
             // confirm files were imported
             updateDatasetJsonPath();
@@ -850,17 +833,15 @@ public class FileRecordJobIT {
             createTestFile(dsDir, "testfile2.txt", 0.25);
 
             JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
-            StepExecutionEntity step2 = job.getSteps().get(1);
             Map<String, Long> metrics1 = step1.getMetrics();
-            Map<String, Long> metrics2 = step2.getMetrics();
             // check job status
-            assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(job.getStatus(), BatchStatus.COMPLETED);
+            assertEquals(job.getExitStatus(), BatchStatus.FAILED.name());
+            assertEquals(job.getStatus(), BatchStatus.FAILED);
             // check step 1 status and name
-            assertEquals(step1.getExitStatus(), BatchStatus.COMPLETED.name());
-            assertEquals(step1.getStatus(), BatchStatus.COMPLETED);
+            assertEquals(step1.getExitStatus(), BatchStatus.FAILED.name());
+            assertEquals(step1.getStatus(), BatchStatus.FAILED);
             assertEquals(step1.getName(), "import-files");
             // verify step 1 metrics
             assertEquals((long) metrics1.get("write_skip_count"), 0);
@@ -873,21 +854,6 @@ public class FileRecordJobIT {
             assertEquals((long) metrics1.get("read_count"), 2);
             // should be no user data (error messages)
             assertEquals(step1.getPersistentUserData(), null);
-            // check step 2 status and name
-            assertEquals(step2.getExitStatus(), BatchStatus.FAILED.name());
-            assertEquals(step2.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(step2.getName(), "import-checksums");
-            // verify step 2 metrics
-            assertEquals((long) metrics2.get("write_skip_count"), 0);
-            assertEquals((long) metrics2.get("commit_count"), 1);
-            assertEquals((long) metrics2.get("process_skip_count"), 0);
-            assertEquals((long) metrics2.get("read_skip_count"), 0);
-            assertEquals((long) metrics2.get("write_count"), 0);
-            assertEquals((long) metrics2.get("rollback_count"), 0);
-            assertEquals((long) metrics2.get("filter_count"), 0);
-            assertEquals((long) metrics2.get("read_count"), 0);
-            // should include detailed error message
-            assert(step2.getPersistentUserData().contains("FAILED: missing checksums"));
 
             // confirm files were imported and checksums unknown
             updateDatasetJsonPath();
@@ -930,11 +896,9 @@ public class FileRecordJobIT {
             }
 
             JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
-            StepExecutionEntity step2 = job.getSteps().get(1);
             Map<String, Long> metrics1 = step1.getMetrics();
-            Map<String, Long> metrics2 = step2.getMetrics();
             // check job status
             assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
             assertEquals(job.getStatus(), BatchStatus.COMPLETED);
@@ -953,21 +917,6 @@ public class FileRecordJobIT {
             assertEquals((long) metrics1.get("read_count"), 2);
             // should be no user data (error messages)
             assertEquals(step1.getPersistentUserData(), null);
-            // check step 2 status and name
-            assertEquals(step2.getExitStatus(), BatchStatus.FAILED.name());
-            assertEquals(step2.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(step2.getName(), "import-checksums");
-            // verify step 2 metrics
-            assertEquals((long) metrics2.get("write_skip_count"), 0);
-            assertEquals((long) metrics2.get("commit_count"), 1);
-            assertEquals((long) metrics2.get("process_skip_count"), 0);
-            assertEquals((long) metrics2.get("read_skip_count"), 0);
-            assertEquals((long) metrics2.get("write_count"), 1);
-            assertEquals((long) metrics2.get("rollback_count"), 0);
-            assertEquals((long) metrics2.get("filter_count"), 0);
-            assertEquals((long) metrics2.get("read_count"), 1);
-            // should include detailed error message
-            assert(step2.getPersistentUserData().contains("FAILED: missing checksums [testfile2.txt]"));
 
             // confirm files were imported
             updateDatasetJsonPath();
@@ -1018,11 +967,9 @@ public class FileRecordJobIT {
             }
 
             JobExecutionEntity job = getJob();
-            assertEquals(job.getSteps().size(), 2);
+            assertEquals(job.getSteps().size(), 1);
             StepExecutionEntity step1 = job.getSteps().get(0);
-            StepExecutionEntity step2 = job.getSteps().get(1);
             Map<String, Long> metrics1 = step1.getMetrics();
-            Map<String, Long> metrics2 = step2.getMetrics();
             // check job status
             assertEquals(job.getExitStatus(), BatchStatus.COMPLETED.name());
             assertEquals(job.getStatus(), BatchStatus.COMPLETED);
@@ -1041,21 +988,6 @@ public class FileRecordJobIT {
             assertEquals((long) metrics1.get("read_count"), 2);
             // should be no user data (error messages)
             assertEquals(step1.getPersistentUserData(), null);
-            // check step 2 status and name
-            assertEquals(step2.getExitStatus(), BatchStatus.FAILED.name());
-            assertEquals(step2.getStatus(), BatchStatus.COMPLETED);
-            assertEquals(step2.getName(), "import-checksums");
-            // verify step 2 metrics
-            assertEquals((long) metrics2.get("write_skip_count"), 0);
-            assertEquals((long) metrics2.get("commit_count"), 1);
-            assertEquals((long) metrics2.get("process_skip_count"), 0);
-            assertEquals((long) metrics2.get("read_skip_count"), 0);
-            assertEquals((long) metrics2.get("write_count"), 2);
-            assertEquals((long) metrics2.get("rollback_count"), 0);
-            assertEquals((long) metrics2.get("filter_count"), 1);
-            assertEquals((long) metrics2.get("read_count"), 3);
-            // should report missing data file
-            assert(step2.getPersistentUserData().contains("FAILED: missing data files [fileThatDoesntExist.txt]"));
 
             // confirm files were imported
             updateDatasetJsonPath();
