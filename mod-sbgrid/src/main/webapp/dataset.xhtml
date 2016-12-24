@@ -320,89 +320,106 @@
                         <div id="metadata-panel" class="row panel panel-default"
                              jsf:rendered="#{!DatasetPage.workingVersion.deaccessioned}">
                             <div class="panel-body metadata-panel-body">
+                               
+                                <div id="container">
 
-                                <div id="publication" class="form-group" jsf:rendered="#{!empty DatasetPage.datasetVersionUI.relPublicationCitation}">
-                                    <label class="col-sm-3 control-label">
-                                        <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="#{DatasetPage.datasetVersionUI.datasetRelPublications.get(0).description}">#{DatasetPage.datasetVersionUI.datasetRelPublications.get(0).title}</span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <h:outputText value="#{DatasetPage.datasetVersionUI.relPublicationCitation}" escape="false"/>
-                                        <a href="#{DatasetPage.datasetVersionUI.relPublicationUrl}" title="#{DatasetPage.datasetVersionUI.relPublicationUrl}" target="_blank">#{DatasetPage.datasetVersionUI.relPublicationId}</a>
+                                    <div id="model-view-col"
+                                         style="float: left; width: 20%;"
+                                         jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode'))}">
+                                        <img src="http://www.rcsb.org/pdb/images/#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode')).value}_asym_r_500.jpg" width="100%" />
                                     </div>
-                                </div>
+                                    
+                                    <div id="summary-view-col" style="overflow: hidden; width: auto;">
+                                        
+                                        <!-- PUBLICAION -->
+                                        <div id="publication_url" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('publicationURL'))}">
+                                            <label class="col-sm-3 control-label">
+                                              <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Publication">
+                                                    Publication
+                                              </span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <a href="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('publicationURL')).value}" title="Publication" target="_blank">
+                                                    #{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('publicationURL')).value}
+                                                </a>
+                                            </div>
+                                        </div>
 
-                                <!-- PDB ID -->
-                                <div id="pdbid" class="form-group"
-                                     jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode'))}">
-                                    <label class="col-sm-3 control-label">
+                                        <!-- PDB ID -->
+                                        <div id="pdbid" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode'))}">
+                                            <label class="col-sm-3 control-label">
                                               <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info"
                                                     data-original-title="PDB Coordinates">
                                                     #{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode')).value} Coordinates
                                               </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode')).value}" title="PDB" target="_blank">PDB</a>,
-                                        <a href="http://www.ncbi.nlm.nih.gov/Structure/mmdb/mmdbsrv.cgi?uid=#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode')).value}" title="MMDB" target="_blank">MMDB</a>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode')).value}" title="PDB" target="_blank">PDB</a>,
+                                                <a href="http://www.ncbi.nlm.nih.gov/Structure/mmdb/mmdbsrv.cgi?uid=#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('refinedStructurePDBCode')).value}" title="MMDB" target="_blank">MMDB</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- BIOLOGICAL SAMPLE -->
+                                        <div id="biosample" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('biologicalSample'))}">
+                                            <label class="col-sm-3 control-label">
+                                                <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Biological Sample">Biological Sample</span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('biologicalSample')).value}" escape="false"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- DATASET TYPE -->
+                                        <div id="datasettype" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('dataType'))}">
+                                            <label class="col-sm-3 control-label">
+                                                <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Dataset Type">Dataset Type</span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('dataType')).value}" escape="false"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- SUBJECT COMPOSITION -->
+                                        <div id="subjectcomp" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('subjectComposition'))}">
+                                            <label class="col-sm-3 control-label">
+                                                <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Subject Composition">Subject Composition</span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('subjectComposition')).value}" escape="false"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Collection Facility -->
+                                        <div id="collFacility" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('beamlineCollectionFacility'))}">
+                                            <label class="col-sm-3 control-label">
+                                                <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Collection Facility">Collection Facility</span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('beamlineCollectionFacility')).value}" escape="false"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Data Creation Date -->
+                                        <div id="createDate" class="form-group"
+                                             jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('collectionDate'))}">
+                                            <label class="col-sm-3 control-label">
+                                                <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Data Creation Date">Data Creation Date</span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('collectionDate')).value}" escape="false"/>
+                                            </div>
+                                        </div>
+                                        
                                     </div>
+
                                 </div>
-
-                                <!-- BIOLOGICAL SAMPLE -->
-                                <div id="biosample" class="form-group"
-                                     jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('biologicalSample'))}">
-                                    <label class="col-sm-3 control-label">
-                                        <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Biological Sample">Biological Sample</span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('biologicalSample')).value}" escape="false"/>
-                                    </div>
-                                </div>
-
-                                <!-- DATASET TYPE -->
-                                <div id="datasettype" class="form-group"
-                                     jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('dataType'))}">
-                                    <label class="col-sm-3 control-label">
-                                        <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Dataset Type">Dataset Type</span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('dataType')).value}" escape="false"/>
-                                    </div>
-                                </div>
-
-                                <!-- SUBJECT COMPOSITION -->
-                                <div id="subjectcomp" class="form-group"
-                                     jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('subjectComposition'))}">
-                                    <label class="col-sm-3 control-label">
-                                        <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Subject Composition">Subject Composition</span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('subjectComposition')).value}" escape="false"/>
-                                    </div>
-                                </div>
-
-                                <!-- Collection Facility -->
-                                <div id="collFacility" class="form-group"
-                                     jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('beamlineCollectionFacility'))}">
-                                    <label class="col-sm-3 control-label">
-                                        <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Collection Facility">Collection Facility</span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('beamlineCollectionFacility')).value}" escape="false"/>
-                                    </div>
-                                </div>
-
-                                <!-- Data Creation Date -->
-                                <div id="createDate" class="form-group"
-                                     jsf:rendered="#{!empty DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('collectionDate'))}">
-                                    <label class="col-sm-3 control-label">
-                                        <span data-toggle="tooltip" data-placement="auto right" class="tooltiplabel text-info" data-original-title="Data Creation Date">Data Creation Date</span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <h:outputText value="#{DatasetPage.datasetVersionUI.datasetVersion.getDatasetField(datasetFieldServiceBean.findByName('collectionDate')).value}" escape="false"/>
-                                    </div>
-                                </div>
-
-                                <!-- Release Date? Other specific fields? -->
-
+                               
                             </div>
                         </div>
                     </div>
