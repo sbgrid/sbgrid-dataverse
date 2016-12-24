@@ -845,13 +845,13 @@ public class FileRecordJobIT {
             assertEquals(step1.getName(), "import-files");
             // verify step 1 metrics
             assertEquals((long) metrics1.get("write_skip_count"), 0);
-            assertEquals((long) metrics1.get("commit_count"), 1);
+            assertEquals((long) metrics1.get("commit_count"), 0);
             assertEquals((long) metrics1.get("process_skip_count"), 0);
             assertEquals((long) metrics1.get("read_skip_count"), 0);
-            assertEquals((long) metrics1.get("write_count"), 2);
+            assertEquals((long) metrics1.get("write_count"), 0);
             assertEquals((long) metrics1.get("rollback_count"), 0);
             assertEquals((long) metrics1.get("filter_count"), 0);
-            assertEquals((long) metrics1.get("read_count"), 2);
+            assertEquals((long) metrics1.get("read_count"), 0);
             // should be no user data (error messages)
             assertEquals(step1.getPersistentUserData(), null);
 
