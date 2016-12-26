@@ -423,6 +423,18 @@
             <artifactId>xoai-service-provider</artifactId>
             <version>4.1.0-header-patch</version>
         </dependency>
+        <!-- added for enhanced datacite xml -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.23</version>
+        </dependency>
+        <!-- needed to translate language to 639-2 codes -->
+        <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-i18n</artifactId>
+            <version>1.21</version>
+        </dependency>
         <!-- Added for AutoService -->
         <dependency>
             <groupId>com.google.auto.service</groupId>
