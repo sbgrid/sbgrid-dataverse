@@ -321,3 +321,4 @@
 	dataType	Structural Model	sm	1
 	dataType	Micro-Electron Diffraction	me	2
 	dataType	Lattice Light-Sheet Microscopy	llsm	3
+	dataType	XFEL Diffraction	xfel	4
