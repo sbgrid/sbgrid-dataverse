@@ -59,10 +59,10 @@ paths:
       summary: gets upload methods
       description: |
         <p>Gets the list of supported upload methods for the dataverse's <i>(small d)</i> datasets.</p>
-        <p>Currently, the following methods are supported:
+        <p>Currently, the following methods are available:
         <ul>
-        <li>STANDARD (browser uploads)</li>
-        <li>RSYNC</li>
+        <li>GUI (browser uploads)</li>
+        <li>RSYNC (implemented via DCM)</li>
         <li>DROPBOX (requires api key)</li>
         </ul>
         </p>
@@ -104,7 +104,7 @@ paths:
         <p>Sets the list of supported upload methods for the dataverse's <i>(small d)</i> datasets.</p>
         <p>Currently, the following methods are supported:
         <ul>
-        <li>STANDARD browser uploads)</li>
+        <li>GUI browser uploads)</li>
         <li>RSYNC</li>
         <li>DROPBOX (requires api key)</li>
         </ul>
@@ -713,7 +713,7 @@ definitions:
   SetUploadMechanismBody:
     type: string
     description: A colon-separated list of supported upload methods
-    example: STANDARD:RSYNC:DROPBOX
+    example: GUI:RSYNC:DROPBOX
   GetUploadMechanisms:
     type: object
     required:
@@ -729,10 +729,10 @@ definitions:
         items:
           type: string
           enum:
-            - STANDARD
+            - GUI
             - RSYNC
             - DROPBOX
-        example: ["STANDARD", "RSYNC"]
+        example: ["GUI", "RSYNC"]
   ChecksumValidationRequest:
     type: object
     required:
