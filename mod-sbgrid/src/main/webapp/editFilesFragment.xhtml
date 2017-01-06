@@ -254,12 +254,12 @@
                         <p:commandButton
                                 id="rsyncContinue"
                                 value="#{bundle['file.fromRsync.continue']}"
-                                style="display: block; margin: 0 auto;"
+                                style="display: none; margin: 0 auto;"
                                 actionListener="#{EditDatafilesPage.dataset.setRsyncScript('requested')}"
                                 onclick="document.getElementById('datasetForm:rsyncCancel').style.display = 'block'; document.getElementById('syncUploadDiv').style.display = 'block'; this.style.display = 'none'; document.getElementById('standardUploadBlock').style.display = 'none'; document.getElementById('dropboxUploadBlock').style.display = 'none';"
                         />
 
-                        <div id="syncUploadDiv" style="display: none; width: 90%; margin: 0 auto; text-align: center;">
+                        <div id="syncUploadDiv" style="display: block; width: 90%; margin: 0 auto; text-align: center;">
                             <ui:fragment rendered="#{datasetPage}">
                                 <p style="text-align: center">#{bundle['file.fromRsync.request']}</p>
                             </ui:fragment>
@@ -280,7 +280,7 @@
                     <p:commandButton
                             id="rsyncCancel"
                             value="#{bundle['file.fromRsync.cancel']}"
-                            style="display: none; margin: 0 auto; margin-bottom: 10px;"
+                            style="display: block; margin: 0 auto; margin-bottom: 10px;"
                             actionListener="#{EditDatafilesPage.dataset.setRsyncScript('')}"
                             onclick="document.getElementById('datasetForm:rsyncContinue').style.display = 'block'; document.getElementById('syncUploadDiv').style.display = 'none'; this.style.display = 'none'; document.getElementById('standardUploadBlock').style.display = 'block'; document.getElementById('dropboxUploadBlock').style.display = 'block';"/>
                 </div>
